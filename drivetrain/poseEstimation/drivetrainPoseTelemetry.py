@@ -11,7 +11,7 @@ from utils.allianceTransformUtils import transform
 
 class DrivetrainPoseTelemetry:
     """
-    Helper class to wrapper sending all drivetrain Pose related information
+    Helper class to wrapper sending all drivetrain Pose related information 
     to dashboards
     """
 

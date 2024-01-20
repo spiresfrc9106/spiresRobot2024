@@ -20,9 +20,9 @@ class WrapperedPulseWidthEncoder:
         name,
         mountOffsetRad,
         dirInverted,
-        minPulse,
-        maxPulse,
-        minAcceptableFreq,
+        minPulseSec,
+        maxPulseSec,
+        minAcceptableFreqHz,
     ):
         self.dutyCycle = DutyCycle(DigitalInput(port))
         self.name = f"Encoder_{name}"
@@ -34,15 +34,15 @@ class WrapperedPulseWidthEncoder:
         self.curAngleRad = 0
         self.dirInverted = dirInverted
 
-        self.minPulseTimeSec = minPulse
-        self.maxPulseTimeSec = maxPulse
-        self.minAcceptableFreq = minAcceptableFreq
+        self.minPulseTimeSec = minPulseSec
+        self.maxPulseTimeSec = maxPulseSec
+        self.minAcceptableFreqHz = minAcceptableFreqHz
 
     def update(self):
         """Return the raw angle reading from the sensor in radians"""
         freq = self.dutyCycle.getFrequency()
         self.faulted = (
-            freq < self.minAcceptableFreq
+            freq < self.minAcceptableFreqHz
         )  # abnormal frequency, we must be faulted
         self.disconFault.set(self.faulted)
 

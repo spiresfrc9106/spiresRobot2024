@@ -2,8 +2,6 @@
 #Just starting with the minimum stuff we need
 #The math conversions are under units.py
 
-import utils.units
-
 FIELD_LENGTH_FT = 54.0
 
 """

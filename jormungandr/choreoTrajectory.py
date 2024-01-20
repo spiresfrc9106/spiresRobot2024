@@ -5,7 +5,7 @@ from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds
 from utils.constants import FIELD_LENGTH_FT
 
-from utils.units import ft2m, m2ft
+from utils.units import ft2m
 
 
 # Doesn't appear to be pulled into python from Interpolatable

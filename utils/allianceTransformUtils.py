@@ -11,48 +11,49 @@ from utils.units import ft2m
 """
 
 def onRed():
-    return wpilib.DriverStation.getAlliance() == wpilib._wpilib.DriverStation.Alliance.kRed
+    return wpilib.DriverStation.getAlliance() == wpilib._wpilib.DriverStation.Alliance.kRed # pylint: disable=protected-access
         
-def transformX(in_):
+def transformX(givenM):
     if onRed():
-        return (ft2m(FIELD_LENGTH_FT) - in_)
+        return (ft2m(FIELD_LENGTH_FT) - givenM)
     else:
-        return in_
+        return givenM
 
-def transform(in_):
-    if isinstance(in_,Rotation2d):
+def transform(givenObject):
+    # pylint: disable=too-many-return-statements
+    # pylint: disable=too-many-branches
+    if isinstance(givenObject,Rotation2d):
         if onRed():
-            return (Rotation2d.fromDegrees(180) - in_)
+            return (Rotation2d.fromDegrees(180) - givenObject)
         else: 
-            return in_
+            return givenObject
 
-    elif isinstance(in_,Translation2d):
+    elif isinstance(givenObject,Translation2d):
         if onRed():
-            return Translation2d(transformX(in_.X()), in_.Y())
+            return Translation2d(transformX(givenObject.X()), givenObject.Y())
         else:
-            return in_
+            return givenObject
 
-    elif isinstance(in_,Transform2d):
+    elif isinstance(givenObject,Transform2d):
         if onRed():
-            trans = transform(in_.translation())
-            rot = transform(in_.rotation())
+            trans = transform(givenObject.translation())
+            rot = transform(givenObject.rotation())
             return Transform2d(trans, rot)
         else:
-            return in_
+            return givenObject
 
-    elif isinstance(in_,Pose2d):
+    elif isinstance(givenObject,Pose2d):
         if onRed():
-            trans = transform(in_.translation())
-            rot = transform(in_.rotation())
+            trans = transform(givenObject.translation())
+            rot = transform(givenObject.rotation())
             return Pose2d(trans, rot)
         else:
-            return in_
+            return givenObject
 
-    elif isinstance(in_,ChoreoTrajectoryState):
+    elif isinstance(givenObject,ChoreoTrajectoryState):
         if onRed():
-            return in_.flipped()
+            return givenObject.flipped()
         else:
-            return in_
+            return givenObject
 
-    else:
-        TypeError("transform function received unknown type")
+    raise TypeError("transform function received unknown type")

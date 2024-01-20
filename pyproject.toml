@@ -6,7 +6,9 @@
 [tool.robotpy]
 
 # Version of robotpy this project depends on
+# to see what versions are available: https://pypi.org/pypi/robotpy/json
 robotpy_version = "2024.1.1.3"
+
 
 # Which extra RobotPy components should be installed
 # -> equivalent to `pip install robotpy[extra1, ...]
@@ -15,11 +17,11 @@ robotpy_extras = [
     "apriltag",
     # "commands2"
     # "cscore"
-    # "navx"
+    # "navx",
     # "pathplannerlib"
     # "phoenix5"
     # "phoenix6"
-    # "playingwithfusion",
+    # "playingwithfusion"
     "rev",
     # "romi"
     "sim",
@@ -30,4 +32,8 @@ robotpy_extras = [
 requires = [
     "photonlibpy",
     "debugpy==1.6.7",
+    "robotpy-commands-v2==2024.0.0b4",
+    #"numpy==1.26.3"
+    #"numpy==1.25.2",
+    "robotpy-navx==2024.1.0"
 ]

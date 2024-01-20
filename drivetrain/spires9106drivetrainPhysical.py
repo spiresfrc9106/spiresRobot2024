@@ -4,12 +4,11 @@ from wpimath.units import inchesToMeters
 from wpimath.system.plant import DCMotor
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import SwerveDrive4Kinematics
-from wpimath.geometry import Rotation2d
 import navx
 from utils.units import lbsToKg
 from utils.units import deg2Rad
 from utils.units import in2m
-from wrappers.wrapperedRevThroughBoreEncoder import WrapperedRevThroughBoreEncoder
+from wrappers.wrapperedSRXMagEncoder import WrapperedPulseWidthEncoder
 
 # pylint: disable=R0801
 
@@ -82,17 +81,10 @@ MAX_DT_LINEAR_SPEED = MAX_DT_MOTOR_SPEED_RPS / WHEEL_GEAR_RATIO * in2m(WHEEL_RAD
 # Fudged max expected performance
 MAX_FWD_REV_SPEED_MPS = MAX_DT_LINEAR_SPEED * 0.98  # fudge factor due to gearbox losses
 MAX_STRAFE_SPEED_MPS = MAX_DT_LINEAR_SPEED * 0.98  # fudge factor due to gearbox losses
-MAX_ROTATE_SPEED_RAD_PER_SEC = deg2Rad(
-    360.0
-)  # Fixed at the maximum rotational speed we'd want.
+MAX_ROTATE_SPEED_RAD_PER_SEC = deg2Rad(360.0)  # Fixed at the maximum rotational speed we'd want.
 # Accelerations - also a total guess
-MAX_TRANSLATE_ACCEL_MPS2 = (
-    MAX_FWD_REV_SPEED_MPS / 0.50
-)  # 0-full time of 0.5 second - this is a guestimate
-MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = (
-    MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25
-)  # 0-full time of 0.25 second - this is a guestaimate
-
+MAX_TRANSLATE_ACCEL_MPS2 = MAX_FWD_REV_SPEED_MPS / 0.50  # 0-full time of 0.5 second - this is a guestimate
+MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC/.25  # 0-full time of 0.25 second - this is a guestaimate
 
 # Mechanical mounting offsets of the encoder & magnet within the shaft
 # Must be updated whenever the module is reassembled
@@ -125,25 +117,14 @@ BR = 3
 
 # Function make a swerve module azimuth encoder reader object
 def wrapperedSwerveDriveAzmthEncoder(azmthEncoderPortIdx, moduleName, azmthOffsetRad):
-    return WrapperedRevThroughBoreEncoder(
+    return WrapperedPulseWidthEncoder(
         port=azmthEncoderPortIdx,
-        name=moduleName,
+        name=moduleName + "_azmthEnc",
         mountOffsetRad=azmthOffsetRad,
-        dirInverted=True
-    )
-
-class NoGyro():
-
-    def __init__(self):
-        pass
-
-    def getRotation2d(self):
-        return Rotation2d(0.0)
-
-    def isConnected(self):
-        return False
-
-
+        dirInverted=True,
+        minPulseSec=1e-6,
+        maxPulseSec=1025e-6,
+        minAcceptableFreqHz=0.9 / 1025e-6)
 
 # Function make gyro object
 def wrapperedGyro():
@@ -156,30 +137,19 @@ def wrapperedGyro():
     :param spi_bitrate: SPI bitrate (Maximum:  2,000,000)
     :param update_rate_hz: Custom Update Rate (Hz)
     """
-    result = navx.AHRS(spi_port_id=SPI.Port.kMXP, spi_bitrate=1000000, update_rate_hz=50)
-    #result = NoGyro()
-    return result
-
+    return navx.AHRS(spi_port_id=SPI.Port.kMXP, spi_bitrate=2000000, update_rate_hz=66)
 
 # Array of translations from robot's origin (center bottom, on floor) to the module's contact patch with the ground
 robotToModuleTranslations = []
-robotToModuleTranslations.append(
-    Translation2d(WHEEL_BASE_HALF_WIDTH_M, WHEEL_BASE_HALF_LENGTH_M)
-)
-robotToModuleTranslations.append(
-    Translation2d(WHEEL_BASE_HALF_WIDTH_M, -WHEEL_BASE_HALF_LENGTH_M)
-)
-robotToModuleTranslations.append(
-    Translation2d(-WHEEL_BASE_HALF_WIDTH_M, WHEEL_BASE_HALF_LENGTH_M)
-)
-robotToModuleTranslations.append(
-    Translation2d(-WHEEL_BASE_HALF_WIDTH_M, -WHEEL_BASE_HALF_LENGTH_M)
-)
+robotToModuleTranslations.append(Translation2d( WHEEL_BASE_HALF_WIDTH_M,  WHEEL_BASE_HALF_LENGTH_M))
+robotToModuleTranslations.append(Translation2d( WHEEL_BASE_HALF_WIDTH_M, -WHEEL_BASE_HALF_LENGTH_M))
+robotToModuleTranslations.append(Translation2d(-WHEEL_BASE_HALF_WIDTH_M,  WHEEL_BASE_HALF_LENGTH_M))
+robotToModuleTranslations.append(Translation2d(-WHEEL_BASE_HALF_WIDTH_M, -WHEEL_BASE_HALF_LENGTH_M))
 
 # WPILib Kinematics object
 kinematics = SwerveDrive4Kinematics(
-    robotToModuleTranslations[FL],
-    robotToModuleTranslations[FR],
-    robotToModuleTranslations[BL],
-    robotToModuleTranslations[BR],
-)
+        robotToModuleTranslations[FL],
+        robotToModuleTranslations[FR],
+        robotToModuleTranslations[BL],
+        robotToModuleTranslations[BR]
+    )

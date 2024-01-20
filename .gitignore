@@ -3,3 +3,8 @@ simgui-*.json
 networktables.json
 .coverage
 .simulationLogs
+.wpilib
+
+# 9106 specific ignores
+/venv*
+/.idea

@@ -1,26 +1,24 @@
 import random
-
-from wpilib import ADXRS450_Gyro
 import wpilib
 from wpimath.estimator import SwerveDrive4PoseEstimator
-from wpimath.geometry import Pose2d, Rotation2d, Transform3d, Twist2d
+from wpimath.geometry import Pose2d, Rotation2d, Twist2d
 from drivetrain.drivetrainPhysical import kinematics
+from drivetrain.drivetrainPhysical import wrapperedGyro
 from drivetrain.poseEstimation.drivetrainPoseTelemetry import DrivetrainPoseTelemetry
 from utils.faults import Fault
 from utils.signalLogging import log
-from wrappers.wrapperedPhotonCamera import WrapperedPhotonCamera
 
 
-class DrivetrainPoseEstimator:
-    """Wrapper class for all sensors and logic responsible for estimating where the robot is on the field"""
-
+class DrivetrainPoseEstimator():
+    """Wrapper class for all sensors and logic responsible for estimating where the robot is on the field
+    """
     def __init__(self, initialModuleStates):
         self.curEstPose = Pose2d()
         self.curDesPose = Pose2d()
-        self.gyro = ADXRS450_Gyro()
+        self.gyro = wrapperedGyro()
         self.gyroDisconFault = Fault("Gyro Disconnected")
 
-        self.cam = WrapperedPhotonCamera("TEST_CAM", Transform3d())
+        #self.cam = WrapperedPhotonCamera("TEST_CAM", Transform3d())
         self.camTargetsVisible = False
 
         self.poseEst = SwerveDrive4PoseEstimator(
@@ -57,13 +55,11 @@ class DrivetrainPoseEstimator:
         """
 
         # Add any vision observations to the pose estimate
-        self.cam.update(self.curEstPose)
+        #self.cam.update(self.curEstPose)
         self.camTargetsVisible = False
-        for observation in self.cam.getPoseEstimates():
-            self.poseEst.addVisionMeasurement(
-                observation.estFieldPose, observation.time
-            )
-            self.camTargetsVisible = True
+        #for observation in self.cam.getPoseEstimates():
+        #    self.poseEst.addVisionMeasurement(observation.estFieldPose, observation.time)
+        #    self.camTargetsVisible = True
         log("PE Vision Targets Seen", self.camTargetsVisible, "bool")
 
         # Read the gyro angle

@@ -1,5 +1,4 @@
 from wpilib import XboxController
-import wpilib
 from wpimath import applyDeadband
 from wpimath.filter import SlewRateLimiter
 from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS

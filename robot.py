@@ -1,8 +1,12 @@
 import sys
+import gc
 import wpilib
+#from Autonomous.modes.drivePathCircle import DrivePathCircle
 from Autonomous.modes.driveOut import DriveOut
-from dashboard import Dashboard
+from robotConfig import webserverConstructorOrNone
+from robotConfig import dashboardOrNone
 from humanInterface.driverInterface import DriverInterface
+from humanInterface.ledControl import LEDControl
 from drivetrain.drivetrainControl import DrivetrainControl
 from utils.segmentTimeTracker import SegmentTimeTracker
 from utils.signalLogging import SignalWrangler
@@ -10,9 +14,8 @@ from utils.calibration import CalibrationWrangler
 from utils.faults import FaultWrangler
 from utils.crashLogger import CrashLogger
 from utils.rioMonitor import RIOMonitor
+from utils.rioMonitor import DiskStats, RUN_PERIODIC_LOOP
 from utils.singleton import destroyAllSingletonInstances
-from webserver.webserver import Webserver
-from humanInterface.ledControl import LEDControl
 from AutoSequencerV2.autoSequencer import AutoSequencer
 
 
@@ -27,44 +30,101 @@ class MyRobot(wpilib.TimedRobot):
 
         self.crashLogger = CrashLogger()
         wpilib.LiveWindow.disableAllTelemetry()
-        self.webserver = Webserver()
+        
+        self.stt = SegmentTimeTracker()
+        #self.stt.doOptionalPerhapsMarks = True # Uncomment this line to turn on optional stt perhapsMark methods
+        #self.stt.longLoopThresh = 0.020 # Uncomment this line adjust the stt logging time threshold in seconds
+        #                                                                        1         2         3
+        #                                                               12345678901234567890123456789012345
+        self.markStartCrashName          = self.stt.makePaddedMarkName("start-crashLogger")
+        self.markCrashName               = self.stt.makePaddedMarkName("crashLogger")
+        self.markResetGyroName           = self.stt.makePaddedMarkName("driveTrain.resetGyro")
+        self.markDriveTrainName          = self.stt.makePaddedMarkName("driveTrain.update")
+        self.markSignalWranglerName      = self.stt.makePaddedMarkName("SignalWrangler().publishPeriodic")
+        self.markCalibrationWranglerName = self.stt.makePaddedMarkName("CalibrationWrangler().update")
+        self.markFautWranglerName        = self.stt.makePaddedMarkName("FaultWrangler().update()")
+        self.webserver = webserverConstructorOrNone()
+
 
         self.driveTrain = DrivetrainControl()
-
-        self.stt = SegmentTimeTracker()
-
+                
         self.dInt = DriverInterface()
 
         self.ledCtrl = LEDControl()
 
         self.autoSequencer = AutoSequencer()
         self.autoSequencer.addMode(DriveOut())
+        #self.autoSequencer.addMode(DrivePathCircle())
 
-        self.dashboard = Dashboard()
+        self.dashboard = dashboardOrNone()
 
-        self.rioMonitor = RIOMonitor()
+        self.diskStats = DiskStats()
+        self.diskStats.update()
+        #self.rioMonitor = None
+        self.rioMonitor = RIOMonitor(
+            runStyle=RUN_PERIODIC_LOOP,
+            enableDiskUpdates=False
+        )
 
+        print(f"before:0:{len(gc.get_objects(generation=0))}")
+        print(f"before:1:{len(gc.get_objects(generation=1))}")
+        print(f"before:2:{len(gc.get_objects(generation=2))}")
+        gc.freeze()
+        print(f"after:0:{len(gc.get_objects(generation=0))}")
+        print(f"after:1:{len(gc.get_objects(generation=1))}")
+        print(f"after:2:{len(gc.get_objects(generation=2))}")
+
+        
         # Uncomment this and simulate to update the code
         # dependencies graph
         #from codeStructureReportGen import reportGen
         #reportGen.generate(self)
 
+
     def robotPeriodic(self):
+        gc.disable()
         self.stt.start()
+
+        self.stt.perhapsMark(self.markStartCrashName)
         self.crashLogger.update()
+        self.stt.perhapsMark(self.markCrashName)
 
         if self.dInt.getGyroResetCmd():
             self.driveTrain.resetGyro()
+        self.stt.perhapsMark(self.markResetGyroName)
 
         self.driveTrain.update()
-
+        self.stt.perhapsMark(self.markDriveTrainName)
         self.ledCtrl.update()
 
         SignalWrangler().publishPeriodic()
+        self.stt.perhapsMark(self.markSignalWranglerName)
         CalibrationWrangler().update()
-        FaultWrangler().update()
-        self.stt.end()
+        self.stt.perhapsMark(self.markCalibrationWranglerName)
 
+        FaultWrangler().update()
+        self.stt.perhapsMark(self.markFautWranglerName)
+        if self.rioMonitor is not None:
+            self.rioMonitor.updateFromPerioidLoop()
+        self.stt.mark("rioMonitor.updateFromPerioidLoop()_")
+        #print(f"before:{gc.get_stats()}")
+        gc.enable()
+        #gc.collect(generation=0)
+        #self.stt.mark("gc.collect(0)______________________")
+        #gc.collect(generation=1)
+        #self.stt.mark("gc.collect(1)______________________")
+        #gc.collect()
+        self.stt.mark("gc.collect()_______________________")
+        gc.disable()
+        #print(f"after:{gc.get_stats()}")
+        #print(
+        #    f"after:0:{len(gc.get_objects(generation=0)):5} "
+        #    f"1:{len(gc.get_objects(generation=1)):5} "
+        #    f"2:{len(gc.get_objects(generation=2)):5}"
+        #)
+
+        self.stt.end()
+        
     #########################################################
     ## Autonomous-Specific init and update
     def autonomousInit(self):
@@ -109,7 +169,8 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Cleanup
     def endCompetition(self):
-        self.rioMonitor.stopThreads()
+        if hasattr(self, 'rioMonitor') and self.rioMonitor is not None:
+            self.rioMonitor.stopThreads()
         destroyAllSingletonInstances()
         super().endCompetition()
 

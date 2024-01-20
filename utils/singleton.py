@@ -20,3 +20,18 @@ class Singleton(type):
 def destroyAllSingletonInstances():
     global _instances
     _instances = {}
+
+def noSingletonsAround():
+    return len(_instances)==0
+    
+class ShortSingltonLivesUnderTest:
+    # https://stackoverflow.com/questions/26405380/how-do-i-correctly-setup-and-teardown-for-my-pytest-class-with-tests
+
+    @classmethod
+    def setup_class(cls): # pylint: disable=invalid-name
+        assert noSingletonsAround()
+
+
+    @classmethod
+    def teardown_class(cls): # pylint: disable=invalid-name
+        destroyAllSingletonInstances()

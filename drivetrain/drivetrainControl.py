@@ -2,6 +2,7 @@ from wpimath.kinematics import ChassisSpeeds
 from wpimath.geometry import Pose2d, Rotation2d
 from utils.singleton import Singleton
 from utils.allianceTransformUtils import onRed
+from utils.segmentTimeTracker import SegmentTimeTracker
 
 from drivetrain.poseEstimation.drivetrainPoseEstimator import DrivetrainPoseEstimator
 from drivetrain.swerveModuleControl import SwerveModuleControl
@@ -14,28 +15,30 @@ from drivetrain.drivetrainPhysical import (
 from drivetrain.drivetrainPhysical import FR_ENCODER_MOUNT_OFFSET_RAD
 from drivetrain.drivetrainPhysical import BL_ENCODER_MOUNT_OFFSET_RAD
 from drivetrain.drivetrainPhysical import BR_ENCODER_MOUNT_OFFSET_RAD
+from drivetrain.drivetrainPhysical import FL_INVERT_WHEEL_MOTOR
+from drivetrain.drivetrainPhysical import FR_INVERT_WHEEL_MOTOR
+from drivetrain.drivetrainPhysical import BL_INVERT_WHEEL_MOTOR
+from drivetrain.drivetrainPhysical import BR_INVERT_WHEEL_MOTOR
 from drivetrain.drivetrainPhysical import kinematics
-
 
 class DrivetrainControl(metaclass=Singleton):
     """
     Top-level control class for controlling a swerve drivetrain
     """
-
     def __init__(self):
+        self.stt = SegmentTimeTracker()
+        #                                                                          1         2         3
+        #                                                                 12345678901234567890123456789012345
+        self.markDesModStatesName          = self.stt.makePaddedMarkName("desModStates")
+        self.markDesaturateWheelSpeedsName = self.stt.makePaddedMarkName("desaturateWheelSpeeds")
+        self.markSendToModulesName         = self.stt.makePaddedMarkName("SendCommandsToModuleAndUpdate")
+        self.markPoseEstUpdateName         = self.stt.makePaddedMarkName("poseEst.update")
+        self.markGainsHasChangedName       = self.stt.makePaddedMarkName("gains.hasChanged")
         self.modules = []
-        self.modules.append(
-            SwerveModuleControl("FL", 2, 3, 0, FL_ENCODER_MOUNT_OFFSET_RAD, False)
-        )
-        self.modules.append(
-            SwerveModuleControl("FR", 4, 5, 1, FR_ENCODER_MOUNT_OFFSET_RAD, True)
-        )
-        self.modules.append(
-            SwerveModuleControl("BL", 6, 7, 2, BL_ENCODER_MOUNT_OFFSET_RAD, False)
-        )
-        self.modules.append(
-            SwerveModuleControl("BR", 8, 9, 3, BR_ENCODER_MOUNT_OFFSET_RAD, True)
-        )
+        self.modules.append(SwerveModuleControl("FL", 2, 3, 0, FL_ENCODER_MOUNT_OFFSET_RAD, FL_INVERT_WHEEL_MOTOR))
+        self.modules.append(SwerveModuleControl("FR", 4, 5, 1, FR_ENCODER_MOUNT_OFFSET_RAD, FR_INVERT_WHEEL_MOTOR))
+        self.modules.append(SwerveModuleControl("BL", 6, 7, 2, BL_ENCODER_MOUNT_OFFSET_RAD, BL_INVERT_WHEEL_MOTOR))
+        self.modules.append(SwerveModuleControl("BR", 8, 9, 3, BR_ENCODER_MOUNT_OFFSET_RAD, BR_INVERT_WHEEL_MOTOR))
 
         self.desChSpd = ChassisSpeeds()
         self.curDesPose = Pose2d()
@@ -90,21 +93,26 @@ class DrivetrainControl(metaclass=Singleton):
 
         # Given the current desired chassis speeds, convert to module states
         desModStates = kinematics.toSwerveModuleStates(self.desChSpd)
+        self.stt.perhapsMark(self.markDesModStatesName)
 
         # Scale back commands if one corner of the robot is going too fast
         kinematics.desaturateWheelSpeeds(desModStates, MAX_FWD_REV_SPEED_MPS)
+        self.stt.perhapsMark(self.markDesaturateWheelSpeedsName)
 
         # Send commands to modules and update
         for idx, module in enumerate(self.modules):
             module.setDesiredState(desModStates[idx])
             module.update()
+        self.stt.perhapsMark(self.markSendToModulesName)
 
         # Update the estimate of our pose
         self.poseEst.update(self.getModulePositions(), self.getModuleSpeeds())
+        self.stt.perhapsMark(self.markPoseEstUpdateName)
 
         # Update calibration values if they've changed
         if self.gains.hasChanged():
             self._updateAllCals()
+        self.stt.perhapsMark(self.markGainsHasChangedName)
 
     def _updateAllCals(self):
         # Helper function - updates all calibration on request
