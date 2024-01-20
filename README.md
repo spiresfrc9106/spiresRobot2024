@@ -40,9 +40,9 @@ On a RoboRIO:
 Add a space '--' space and then pytest options: https://docs.pytest.org/en/6.2.x/usage.html
 
 ```cmd
-python .\robot.py test -- -xvv
-python .\robot.py test -- -xvvvv
-python .\robot.py test -- -xlsvvvv
+python -m robotpy test -- -xvv
+python -m robotpy test -- -xvvvv
+python -m robotpy test -- -xlsvvvv
 ```
 
 `-xvv` is the same as `-x -vv`
@@ -53,22 +53,22 @@ python .\robot.py test -- -xlsvvvv
 Details
 
 ```cmd
-python .\robot.py test -- --tb=auto    # (default) 'long' tracebacks for the first and last
+python -m robotpy test -- --tb=auto    # (default) 'long' tracebacks for the first and last
                                        # entry, but 'short' style for the other entries
-python .\robot.py test -- --tb=long    # exhaustive, informative traceback formatting
-python .\robot.py test -- --full-trace # long traces to be printed on error (longer than --tb=long). It also ensures 
+python -m robotpy test -- --tb=long    # exhaustive, informative traceback formatting
+python -m robotpy test -- --full-trace # long traces to be printed on error (longer than --tb=long). It also ensures 
                                        # that a stack trace is printed on KeyboardInterrupt (Ctrl+C). This is very 
                                        # useful if the tests are taking too long and you interrupt them with Ctrl+C to 
                                        # find out where the tests are hanging. By default no output will be shown 
                                        # (because KeyboardInterrupt is caught by pytest). By using this option you make
                                        # sure a trace is shown.
-python .\robot.py test -- -l           # pytest lets the stderr/stdout flow through to the console
-python .\robot.py test -- -s           # pytest lets the stderr/stdout flow through to the console
-python .\robot.py test -- -v           # show each individual test step
-python .\robot.py test -- -vv          # pytest shows more details of what faild
-python .\robot.py test -- -vvv         # some plugins might make use of -vvv verbosity.
-python .\robot.py test -- -vvvv        # some plugins might make use of -vvvv verbosity.
-python .\robot.py test -- -x           # stop after first failure
+python -m robotpy test -- -l           # pytest lets the stderr/stdout flow through to the console
+python -m robotpy test -- -s           # pytest lets the stderr/stdout flow through to the console
+python -m robotpy test -- -v           # show each individual test step
+python -m robotpy test -- -vv          # pytest shows more details of what faild
+python -m robotpy test -- -vvv         # some plugins might make use of -vvv verbosity.
+python -m robotpy test -- -vvvv        # some plugins might make use of -vvvv verbosity.
+python -m robotpy test -- -x           # stop after first failure
 ```
 
 # Interesting links
