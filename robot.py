@@ -151,7 +151,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.dInt.update()
-        if (self.trajectoryCtrl.veloTest!=1.0):
+        if (self.trajectoryCtrl.veloTest!=1):
             self.driveTrain.setCmdFieldRelative(
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )
