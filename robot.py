@@ -1,13 +1,13 @@
 import sys
 import gc
 import wpilib
-#from Autonomous.modes.drivePathCircle import DrivePathCircle
 from Autonomous.modes.driveOut import DriveOut
 from robotConfig import webserverConstructorOrNone
 from robotConfig import dashboardOrNone
 from humanInterface.driverInterface import DriverInterface
 from humanInterface.ledControl import LEDControl
 from drivetrain.drivetrainControl import DrivetrainControl
+from drivetrain.drivetrainTrajectoryControl import DrivetrainTrajectoryControl
 from utils.segmentTimeTracker import SegmentTimeTracker
 from utils.signalLogging import SignalWrangler
 from utils.calibration import CalibrationWrangler
@@ -30,10 +30,10 @@ class MyRobot(wpilib.TimedRobot):
 
         self.crashLogger = CrashLogger()
         wpilib.LiveWindow.disableAllTelemetry()
-        
+
         self.stt = SegmentTimeTracker()
-        #self.stt.doOptionalPerhapsMarks = True # Uncomment this line to turn on optional stt perhapsMark methods
-        #self.stt.longLoopThresh = 0.020 # Uncomment this line adjust the stt logging time threshold in seconds
+        # self.stt.doOptionalPerhapsMarks = True # Uncomment this line to turn on optional stt perhapsMark methods
+        # self.stt.longLoopThresh = 0.020 # Uncomment this line adjust the stt logging time threshold in seconds
         #                                                                        1         2         3
         #                                                               12345678901234567890123456789012345
         self.markStartCrashName          = self.stt.makePaddedMarkName("start-crashLogger")
@@ -47,6 +47,7 @@ class MyRobot(wpilib.TimedRobot):
 
 
         self.driveTrain = DrivetrainControl()
+        self.trajectoryCtrl = DrivetrainTrajectoryControl()
                 
         self.dInt = DriverInterface()
 
@@ -150,9 +151,14 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.dInt.update()
-        self.driveTrain.setCmdFieldRelative(
-            self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
-        )
+        if (self.trajectoryCtrl.veloTest!=1.0):
+            self.driveTrain.setCmdFieldRelative(
+                self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
+            )
+        else:
+            self.driveTrain.setCmdRobotRelative(
+                self.trajectoryCtrl.caliVelX, self.trajectoryCtrl.caliVelY, self.trajectoryCtrl.caliVelT
+            )
 
     #########################################################
     ## Disabled-Specific init and update
