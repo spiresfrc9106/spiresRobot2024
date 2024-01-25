@@ -156,7 +156,7 @@ class MyRobot(wpilib.TimedRobot):
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )
         else:
-            self.driveTrain.setCmdRobotRelative(
+            self.driveTrain.setCmdFieldRelative(
                 self.trajectoryCtrl.caliVelX, self.trajectoryCtrl.caliVelY, self.trajectoryCtrl.caliVelT
             )
 
