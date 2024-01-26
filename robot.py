@@ -17,6 +17,7 @@ from utils.rioMonitor import RIOMonitor
 from utils.rioMonitor import DiskStats, RUN_PERIODIC_LOOP
 from utils.singleton import destroyAllSingletonInstances
 from AutoSequencerV2.autoSequencer import AutoSequencer
+from AutoSequencerV2.teleopConditions import TeleConditions
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -56,6 +57,8 @@ class MyRobot(wpilib.TimedRobot):
         self.autoSequencer = AutoSequencer()
         self.autoSequencer.addMode(DriveOut())
         #self.autoSequencer.addMode(DrivePathCircle())
+
+        self.teleConditions = TeleConditions()
 
         self.dashboard = dashboardOrNone()
 
@@ -150,8 +153,9 @@ class MyRobot(wpilib.TimedRobot):
         pass
 
     def teleopPeriodic(self):
+        self.teleConditions.update()
         self.dInt.update()
-        if (self.trajectoryCtrl.veloTest!=1):
+        if self.trajectoryCtrl.veloTest!=True:
             self.driveTrain.setCmdFieldRelative(
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )

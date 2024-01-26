@@ -40,6 +40,9 @@
   },
   "NetworkTables": {
     "transitory": {
+      "Autonomous": {
+        "open": true
+      },
       "SmartDashboard": {
         "open": true
       }
@@ -47,8 +50,5 @@
   },
   "NetworkTables Info": {
     "visible": true
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

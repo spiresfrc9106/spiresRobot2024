@@ -1,4 +1,5 @@
 from AutoSequencerV2.autoSequencer import AutoSequencer
+from AutoSequencerV2.teleopConditions import TeleConditions
 from dashboardWidgets.autoChooser import AutoChooser
 from dashboardWidgets.swerveState import SwerveState
 from dashboardWidgets.text import Text
@@ -13,6 +14,14 @@ class Dashboard:
             AutoChooser(
                 50,
                 10,
+                TeleConditions().getCtrlModeNTTableName(),
+                TeleConditions().getCtrlModeList(),
+            )
+        )
+        Webserver().addDashboardWidget(
+            AutoChooser(
+                50,
+                20,
                 AutoSequencer().getDelayModeNTTableName(),
                 AutoSequencer().getDelayModeList(),
             )
@@ -20,7 +29,7 @@ class Dashboard:
         Webserver().addDashboardWidget(
             AutoChooser(
                 50,
-                20,
+                30,
                 AutoSequencer().getMainModeNTTableName(),
                 AutoSequencer().getMainModeList(),
             )

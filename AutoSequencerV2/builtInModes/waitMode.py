@@ -10,5 +10,5 @@ class WaitMode(Mode):
         self._duration = duration
 
     def getCmdGroup(self):
-        # A wait mode should have only one command, jsut wait the specified duration
+        # A wait mode should have only one command, just wait the specified duration
         return WaitCommand(self._duration)
