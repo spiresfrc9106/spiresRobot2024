@@ -155,19 +155,21 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.teleConditions.update()
         self.dInt.update()
-        if self.trajectoryCtrl.veloTest!=True:
+        if not self.teleConditions.veloTest:
             self.driveTrain.setCmdFieldRelative(
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )
         else:
-            self.driveTrain.setCmdFieldRelative(
-                self.trajectoryCtrl.caliVelX, self.trajectoryCtrl.caliVelY, self.trajectoryCtrl.caliVelT
-            )
+            self.driveTrain.setCmdFieldRelative(self.trajectoryCtrl.caliVelX.get(),
+                                                self.trajectoryCtrl.caliVelY.get(),
+                                                self.trajectoryCtrl.caliVelT.get()
+                                                )
 
     #########################################################
     ## Disabled-Specific init and update
     def disabledPeriodic(self):
         self.autoSequencer.updateMode()
+        self.teleConditions.updateMode()
         self.driveTrain.trajCtrl.updateCals()
 
     #########################################################

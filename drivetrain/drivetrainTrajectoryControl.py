@@ -20,7 +20,6 @@ class DrivetrainTrajectoryControl:
     """
 
     def __init__(self):
-        self.veloTest = False
         self.caliVelX = Calibration("Test X Velocity MPS", 0.0)
         self.caliVelY = Calibration("Test Y Velocity MPS", 0.0)
         self.caliVelT = Calibration("Test Angular Velocity RPS", 0.0)

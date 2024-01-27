@@ -43,6 +43,21 @@
       "Autonomous": {
         "open": true
       },
+      "Calibrations": {
+        "Drivetrain HDC Rotation kI": {
+          "open": true
+        },
+        "Test Angular Velocity RPS": {
+          "open": true
+        },
+        "Test X Velocity MPS": {
+          "open": true
+        },
+        "Test Y Velocity MPS": {
+          "open": true
+        },
+        "open": true
+      },
       "SmartDashboard": {
         "open": true
       }

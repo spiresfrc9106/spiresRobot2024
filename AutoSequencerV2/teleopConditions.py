@@ -25,6 +25,7 @@ class TeleConditions(metaclass=Singleton):
         # Alliance changes require us to re-plan autonomous
         # This variable is used to help track when alliance changes
         self._prevOnRed = onRed()
+        self.veloTest = False
 
         self.updateMode(force=True)  # Ensure we load the teleop conditions at least once.
 
@@ -45,6 +46,10 @@ class TeleConditions(metaclass=Singleton):
         if ctrlChanged or force or self._allianceChanged():
             ctrlMode = self.ctrlModeList.getCurMode()
             self.topLevelCmdGroup = ctrlMode.getCmdGroup()
+            if ctrlMode.getName() == "Testing Controls":
+                self.veloTest = True
+            else:
+                self.veloTest = False
             print(
                 f"[Tele] New Modes Selected:  {ctrlMode.getName()}"
             )
