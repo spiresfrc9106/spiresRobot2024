@@ -10,14 +10,14 @@ class Dashboard:
     def __init__(self):
         Webserver().addDashboardWidget(Text(50, 75, "/SmartDashboard/faultDescription"))
         Webserver().addDashboardWidget(SwerveState(85, 15))
-        Webserver().addDashboardWidget(
-            AutoChooser(
-                50,
-                10,
-                TeleConditions().getCtrlModeNTTableName(),
-                TeleConditions().getCtrlModeList(),
-            )
-        )
+        # Webserver().addDashboardWidget(
+        #     AutoChooser(
+        #         50,
+        #         10,
+        #         TeleConditions().getCtrlModeNTTableName(),
+        #         TeleConditions().getCtrlModeList(),
+        #     )
+        # )
         Webserver().addDashboardWidget(
             AutoChooser(
                 50,

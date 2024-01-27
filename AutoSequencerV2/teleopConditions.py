@@ -55,11 +55,6 @@ class TeleConditions(metaclass=Singleton):
             )
 
     # Call this once during autonmous init to init the current command sequence
-    def initiaize(self):
-        self.topLevelCmdGroup.initialize()
-
-    def update(self):
-        self.topLevelCmdGroup.execute()
 
     def end(self):
         self.topLevelCmdGroup.end(True)

@@ -62,6 +62,10 @@ class MyRobot(wpilib.TimedRobot):
 
         self.dashboard = dashboardOrNone()
 
+        self.caliVelX = 0.0
+        self.caliVelY = 0.0
+        self.caliVelT = 0.0
+
         self.diskStats = DiskStats()
         self.diskStats.update()
         #self.rioMonitor = None
@@ -153,17 +157,23 @@ class MyRobot(wpilib.TimedRobot):
         pass
 
     def teleopPeriodic(self):
-        self.teleConditions.update()
+        # self.teleConditions.update()
         self.dInt.update()
         if not self.teleConditions.veloTest:
             self.driveTrain.setCmdFieldRelative(
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )
-        else:
-            self.driveTrain.setCmdFieldRelative(self.trajectoryCtrl.caliVelX.get(),
-                                                self.trajectoryCtrl.caliVelY.get(),
-                                                self.trajectoryCtrl.caliVelT.get()
-                                                )
+        # else:
+            # if (self.trajectoryCtrl.caliVelX.isChanged()):
+            #     self.caliVelX = self.trajectoryCtrl.caliVelX.get()
+            # if (self.trajectoryCtrl.caliVelY.isChanged()):
+            #     self.caliVelY = self.trajectoryCtrl.caliVelY.get()
+            # if (self.trajectoryCtrl.caliVelT.isChanged()):
+            #     self.caliVelT = self.trajectoryCtrl.caliVelT.get()
+            # self.driveTrain.setCmdFieldRelative(self.caliVelX,
+            #                                     self.caliVelY,
+            #                                     self.caliVelT
+            #                                     )
 
     #########################################################
     ## Disabled-Specific init and update

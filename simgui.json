@@ -44,6 +44,9 @@
         "open": true
       },
       "Calibrations": {
+        "Drivetrain HDC Rotation kD": {
+          "open": true
+        },
         "Drivetrain HDC Rotation kI": {
           "open": true
         },
