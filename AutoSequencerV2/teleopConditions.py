@@ -29,21 +29,12 @@ class TeleConditions(metaclass=Singleton):
 
         self.updateMode(force=True)  # Ensure we load the teleop conditions at least once.
 
-    # Returns true if the alliance has changed since the last call
-    def _allianceChanged(self):
-        curRed = onRed()
-        retVal = curRed != self._prevOnRed
-        self._prevOnRed = curRed
-        return retVal
-    #
-    # def addMode(self, newMode):
-    #     self.mainModeList.addMode(newMode)
 
     # Call this periodically while disabled to keep the dashboard updated
     # and, when things change, re-init modes
     def updateMode(self, force=False):
         ctrlChanged = self.ctrlModeList.updateMode()
-        if ctrlChanged or force or self._allianceChanged():
+        if ctrlChanged or force:
             ctrlMode = self.ctrlModeList.getCurMode()
             self.topLevelCmdGroup = ctrlMode.getCmdGroup()
             if ctrlMode.getName() == "Testing Controls":

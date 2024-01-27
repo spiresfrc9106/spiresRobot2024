@@ -20,9 +20,13 @@ class DrivetrainTrajectoryControl:
     """
 
     def __init__(self):
-        # self.caliVelX = Calibration(name="Test X Velocity MPS", default=0.0)
-        # self.caliVelY = Calibration(name="Test Y Velocity MPS", default=0.0)
-        # self.caliVelT = Calibration(name="Test Angular Velocity RPS", default=0.0)
+        self.caliVelX = Calibration(name="Test X Velocity MPS", default=0.0)
+        self.caliVelY = Calibration(name="Test Y Velocity MPS", default=0.0)
+        self.caliVelT = Calibration(name="Test Angular Velocity RPS", default=0.0)
+
+        self.insaneX = 0.0
+        self.insaneY = 0.0
+        self.insaneT = 0.0
 
         self.curVx = 0
         self.curVy = 0
@@ -62,6 +66,9 @@ class DrivetrainTrajectoryControl:
         self.xCtrl.setPID(self.transP.get(), self.transI.get(), self.transD.get())
         self.yCtrl.setPID(self.transP.get(), self.transI.get(), self.transD.get())
         self.tCtrl.setPID(self.rotP.get(), self.rotI.get(), self.rotD.get())
+        self.insaneX = self.caliVelX.get()
+        self.insaneY = self.caliVelY.get()
+        self.insaneT = self.caliVelT.get()
 
     def update(self, trajCmd, curEstPose):
         """Main periodic update, call this whenever you need new commands

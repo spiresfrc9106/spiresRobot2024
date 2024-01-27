@@ -7,7 +7,6 @@ from wpimath.kinematics import SwerveModulePosition
 from wpimath.geometry import Rotation2d
 import wpilib
 
-
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from dashboardWidgets.swerveState import getAzmthDesTopicName, getAzmthActTopicName
 from dashboardWidgets.swerveState import getSpeedDesTopicName, getSpeedActTopicName
@@ -19,7 +18,6 @@ from drivetrain.drivetrainPhysical import dtLinearToMotorRot
 from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS
 from drivetrain.drivetrainPhysical import INVERT_AZMTH_MOTOR
 from drivetrain.drivetrainPhysical import wrapperedSwerveDriveAzmthEncoder
-
 
 class SwerveModuleControl:
     """

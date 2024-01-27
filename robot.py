@@ -7,7 +7,7 @@ from robotConfig import dashboardOrNone
 from humanInterface.driverInterface import DriverInterface
 from humanInterface.ledControl import LEDControl
 from drivetrain.drivetrainControl import DrivetrainControl
-from drivetrain.drivetrainTrajectoryControl import DrivetrainTrajectoryControl
+# from drivetrain.drivetrainTrajectoryControl import DrivetrainTrajectoryControl
 from utils.segmentTimeTracker import SegmentTimeTracker
 from utils.signalLogging import SignalWrangler
 from utils.calibration import CalibrationWrangler
@@ -48,7 +48,7 @@ class MyRobot(wpilib.TimedRobot):
 
 
         self.driveTrain = DrivetrainControl()
-        self.trajectoryCtrl = DrivetrainTrajectoryControl()
+        # self.trajectoryCtrl = DrivetrainTrajectoryControl()
                 
         self.dInt = DriverInterface()
 
@@ -58,13 +58,13 @@ class MyRobot(wpilib.TimedRobot):
         self.autoSequencer.addMode(DriveOut())
         #self.autoSequencer.addMode(DrivePathCircle())
 
-        self.teleConditions = TeleConditions()
+        # self.teleConditions = TeleConditions()
 
         self.dashboard = dashboardOrNone()
 
-        self.caliVelX = 0.0
-        self.caliVelY = 0.0
-        self.caliVelT = 0.0
+        # self.caliVelX = 0.0
+        # self.caliVelY = 0.0
+        # self.caliVelT = 0.0
 
         self.diskStats = DiskStats()
         self.diskStats.update()
@@ -159,7 +159,7 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         # self.teleConditions.update()
         self.dInt.update()
-        if not self.teleConditions.veloTest:
+        if True: #not self.teleConditions.veloTest
             self.driveTrain.setCmdFieldRelative(
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )
@@ -179,7 +179,7 @@ class MyRobot(wpilib.TimedRobot):
     ## Disabled-Specific init and update
     def disabledPeriodic(self):
         self.autoSequencer.updateMode()
-        self.teleConditions.updateMode()
+        # self.teleConditions.updateMode()
         self.driveTrain.trajCtrl.updateCals()
 
     #########################################################
