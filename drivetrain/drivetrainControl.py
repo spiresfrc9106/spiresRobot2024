@@ -137,7 +137,7 @@ class DrivetrainControl(metaclass=Singleton):
         # Update pose estimator to think we're at the same translation,
         # but aligned facing downfield
         curTranslation = self.poseEst.getCurEstPose().translation()
-        newGyroRotation = Rotation2d(0.0) if(onRed()) else Rotation2d(180.0)
+        newGyroRotation = Rotation2d.fromDegrees(180.0) if(onRed()) else Rotation2d.fromDegrees(0.0)
         newPose = Pose2d(curTranslation, newGyroRotation)
         self.poseEst.setKnownPose(newPose)
 

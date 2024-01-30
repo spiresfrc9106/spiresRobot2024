@@ -288,3 +288,10 @@ robotpy-wpiutil           2023.4.3.0
 setuptools                65.5.0
 wpilib                    2023.4.3.0
 ```
+
+
+## Linting (Added)
+
+```
+pylint --rcfile=.pylintrc **\*.py
+```
