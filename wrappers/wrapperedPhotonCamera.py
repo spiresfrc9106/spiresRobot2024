@@ -11,8 +11,6 @@ class CameraPoseObservation:
         self.estFieldPose = estFieldPose
         self.trustworthiness = trustworthiness  # TODO - not used yet
 
-#
-
 class WrapperedPhotonCamera:
     def __init__(self, camName, robotToCam):
         setVersionCheckEnabled(False)
