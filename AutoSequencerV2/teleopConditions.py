@@ -9,11 +9,28 @@ from AutoSequencerV2.sequentialCommandGroup import SequentialCommandGroup
 from utils.singleton import Singleton
 from utils.allianceTransformUtils import onRed
 
+from wpimath.controller import PIDController
+from wpimath.kinematics import ChassisSpeeds
+from utils.calibration import Calibration
+from utils.signalLogging import log
+from utils.mathUtils import limit
+
+
+class Wheel:
+    def __init__(self, velocity, angle):
+        self.velocity = velocity
+        self.angle = angle
 
 class TeleConditions(metaclass=Singleton):
     """Top-level implementation of the AutoSequencer"""
 
     def __init__(self):
+
+        self.wheelFL = Wheel(Calibration("Wheel FL Velocity", 0.0), Calibration("Wheel FL Angle", 0.0))
+        self.wheelFR = Wheel(Calibration("Wheel FR Velocity", 0.0), Calibration("Wheel FR Angle", 0.0))
+        self.wheelBL = Wheel(Calibration("Wheel BL Velocity", 0.0), Calibration("Wheel BL Angle", 0.0))
+        self.wheelBR = Wheel(Calibration("Wheel BR Velocity", 0.0), Calibration("Wheel BR Angle", 0.0))
+
         # Have different delay modes for delaying the start of autonomous
         self.ctrlModeList = ModeList("Ctrl")
         self.ctrlModeList.addMode(XboxCtrl())
@@ -59,3 +76,11 @@ class TeleConditions(metaclass=Singleton):
 
     def getStartingPose(self):
         return self.startPose
+
+    def getWheelControl(self, name, item):
+        wheel = getattr(self, 'wheel' + name, None)
+        if wheel:
+            temp = getattr(wheel, item, None)
+            return temp.get()
+        else:
+            return 0.0

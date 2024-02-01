@@ -58,8 +58,6 @@ class MyRobot(wpilib.TimedRobot):
         self.autoSequencer.addMode(DriveOut())
         #self.autoSequencer.addMode(DrivePathCircle())
 
-        # self.teleConditions = TeleConditions()
-
         self.dashboard = dashboardOrNone()
 
         # self.caliVelX = 0.0
@@ -82,7 +80,8 @@ class MyRobot(wpilib.TimedRobot):
         print(f"after:1:{len(gc.get_objects(generation=1))}")
         print(f"after:2:{len(gc.get_objects(generation=2))}")
 
-        
+        self.teleConditions = TeleConditions()
+
         # Uncomment this and simulate to update the code
         # dependencies graph
         #from codeStructureReportGen import reportGen
@@ -159,10 +158,15 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         # self.teleConditions.update()
         self.dInt.update()
-        if True: #not self.teleConditions.veloTest
+        if not self.teleConditions.veloTest:
             self.driveTrain.setCmdFieldRelative(
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )
+        else:
+            self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"), self.teleConditions.getWheelControl("FR","angle"))
+            self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"), self.teleConditions.getWheelControl("FL","angle"))
+            self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"), self.teleConditions.getWheelControl("BR","angle"))
+            self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"), self.teleConditions.getWheelControl("BL","angle"))
         # else:
             # if (self.trajectoryCtrl.caliVelX.isChanged()):
             #     self.caliVelX = self.trajectoryCtrl.caliVelX.get()
@@ -178,9 +182,9 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Disabled-Specific init and update
     def disabledPeriodic(self):
-        self.autoSequencer.updateMode()
-        # self.teleConditions.updateMode()
         self.driveTrain.trajCtrl.updateCals()
+        self.teleConditions.updateMode()
+        self.autoSequencer.updateMode()
 
     #########################################################
     ## Test-Specific init and update

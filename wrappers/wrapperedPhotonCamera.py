@@ -11,6 +11,7 @@ class CameraPoseObservation:
         self.estFieldPose = estFieldPose
         self.trustworthiness = trustworthiness  # TODO - not used yet
 
+#
 
 class WrapperedPhotonCamera:
     def __init__(self, camName, robotToCam):
@@ -49,7 +50,7 @@ class WrapperedPhotonCamera:
 
         # Process each target.
         # Each target has multiple solutions for where you could have been at on the field
-        # when you observed it 
+        # when you observed it
         # (https://docs.wpilib.org/en/stable/docs/software/vision-processing/
         # apriltag/apriltag-intro.html#d-to-3d-ambiguity)
         # We want to select the best possible pose per target

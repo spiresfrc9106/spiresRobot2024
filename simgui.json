@@ -41,6 +41,9 @@
   "NetworkTables": {
     "transitory": {
       "Autonomous": {
+        "Ctrl": {
+          "open": true
+        },
         "open": true
       },
       "Calibrations": {
