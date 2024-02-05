@@ -18,6 +18,7 @@ from utils.rioMonitor import DiskStats, RUN_PERIODIC_LOOP
 from utils.singleton import destroyAllSingletonInstances
 from AutoSequencerV2.autoSequencer import AutoSequencer
 from AutoSequencerV2.teleopConditions import TeleConditions
+from gamepieceCtrl.gamepiecces import GamePieceCtrl
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -81,6 +82,7 @@ class MyRobot(wpilib.TimedRobot):
         print(f"after:2:{len(gc.get_objects(generation=2))}")
 
         self.teleConditions = TeleConditions()
+        self.pieceCtrl = GamePieceCtrl()
 
         # Uncomment this and simulate to update the code
         # dependencies graph
@@ -167,8 +169,10 @@ class MyRobot(wpilib.TimedRobot):
             self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"), self.teleConditions.getWheelControl("FL","angle"))
             self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"), self.teleConditions.getWheelControl("BR","angle"))
             self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"), self.teleConditions.getWheelControl("BL","angle"))
+            self.pieceCtrl.update()
         # else:
-            # if (self.trajectoryCtrl.caliVelX.isChanged()):
+            # if (self.trajectoryCtrl.cal
+        # VelX.isChanged()):
             #     self.caliVelX = self.trajectoryCtrl.caliVelX.get()
             # if (self.trajectoryCtrl.caliVelY.isChanged()):
             #     self.caliVelY = self.trajectoryCtrl.caliVelY.get()
