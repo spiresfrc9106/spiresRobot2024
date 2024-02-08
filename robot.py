@@ -18,7 +18,7 @@ from utils.rioMonitor import DiskStats, RUN_PERIODIC_LOOP
 from utils.singleton import destroyAllSingletonInstances
 from AutoSequencerV2.autoSequencer import AutoSequencer
 from AutoSequencerV2.teleopConditions import TeleConditions
-from gamepieceCtrl.gamepiecces import GamePieceCtrl
+from pieceMaster.gamePieceCtrl import GamePieceCtrl
 
 
 class MyRobot(wpilib.TimedRobot):
