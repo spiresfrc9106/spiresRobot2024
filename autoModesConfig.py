@@ -1,5 +1,5 @@
 from AutoSequencerV2.modeList import ModeList
-from AutoSequencerV2.smartDashboardModeList import SmartDashboardModeList
+#from AutoSequencerV2.smartDashboardModeList import SmartDashboardModeList
 from AutoSequencerV2.builtInModes.doNothingMode import DoNothingMode
 from AutoSequencerV2.builtInModes.waitMode import WaitMode
 from AutoSequencerV2.builtInCtrl.caliCtrl import CaliCtrl
@@ -13,7 +13,6 @@ def makeCtrlModeList():
     ctrlModeList = ModeList("Ctrl")
     ctrlModeList.addMode(XboxCtrl())
     ctrlModeList.addMode(CaliCtrl())
-    ctrlModeList.listIsComplete()
     return ctrlModeList
 
 def makeDelayModeList():

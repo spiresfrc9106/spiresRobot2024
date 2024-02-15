@@ -1,9 +1,10 @@
 from wpimath.kinematics import ChassisSpeeds
 from wpimath.geometry import Pose2d, Rotation2d
+from wpimath.kinematics import SwerveModuleState
+
 from utils.singleton import Singleton
 from utils.allianceTransformUtils import onRed
 from utils.segmentTimeTracker import SegmentTimeTracker
-from wpimath.kinematics import SwerveModuleState
 
 from drivetrain.poseEstimation.drivetrainPoseEstimator import DrivetrainPoseEstimator
 from drivetrain.swerveModuleControl import SwerveModuleControl
@@ -69,7 +70,7 @@ class DrivetrainControl(metaclass=Singleton):
         for module in self.modules:
             if module.moduleName == moduleName:
                 # Create a new SwerveModuleState and apply it to the module
-                module_state = SwerveModuleState(speed, Rotation2d.fromDegrees(angle))
+                module_state = SwerveModuleState(speed, Rotation2d.fromDegrees(angle)) # pylint: disable=invalid-name
                 module.setDesiredState(module_state)
                 module.update()
                 return
@@ -115,7 +116,7 @@ class DrivetrainControl(metaclass=Singleton):
         Main periodic update, should be called every 20ms
         """
 
-        if self.teleConditions.veloTest == True:
+        if self.teleConditions.veloTest:
             return
 
         # Given the current desired chassis speeds, convert to module states

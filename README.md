@@ -92,11 +92,18 @@ Note any folder or file prefixed with a `.` will be skipped in the deploy.
 
 ## Linting
 
+Yavin clutch code:
+
+```
+pylint --rcfile=.pylintrc **\*.py
+```
+
 "Linting" is the process of checking our code format and style to keep it looking nice
 
 `lint.bat` will execute the linter.
 
 `.pylintrc` contains configuration about what checks the linter runs, and what formatting it enforces
+
 
 ## Testing
 
@@ -287,11 +294,4 @@ robotpy-wpinet            2023.4.3.0
 robotpy-wpiutil           2023.4.3.0
 setuptools                65.5.0
 wpilib                    2023.4.3.0
-```
-
-
-## Linting (Added)
-
-```
-pylint --rcfile=.pylintrc **\*.py
 ```

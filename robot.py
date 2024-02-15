@@ -19,6 +19,7 @@ from utils.singleton import destroyAllSingletonInstances
 from AutoSequencerV2.autoSequencer import AutoSequencer
 from AutoSequencerV2.teleopConditions import TeleConditions
 from pieceMaster.gamePieceCtrl import GamePieceCtrl
+from debugMaster.debug import Debug
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -38,28 +39,28 @@ class MyRobot(wpilib.TimedRobot):
         # self.stt.longLoopThresh = 0.020 # Uncomment this line adjust the stt logging time threshold in seconds
         #                                                                        1         2         3
         #                                                               12345678901234567890123456789012345
-        self.markStartCrashName          = self.stt.makePaddedMarkName("start-crashLogger")
-        self.markCrashName               = self.stt.makePaddedMarkName("crashLogger")
-        self.markResetGyroName           = self.stt.makePaddedMarkName("driveTrain.resetGyro")
-        self.markDriveTrainName          = self.stt.makePaddedMarkName("driveTrain.update")
-        self.markSignalWranglerName      = self.stt.makePaddedMarkName("SignalWrangler().publishPeriodic")
+        self.markStartCrashName = self.stt.makePaddedMarkName("start-crashLogger")
+        self.markCrashName = self.stt.makePaddedMarkName("crashLogger")
+        self.markResetGyroName = self.stt.makePaddedMarkName("driveTrain.resetGyro")
+        self.markDriveTrainName = self.stt.makePaddedMarkName("driveTrain.update")
+        self.markSignalWranglerName = self.stt.makePaddedMarkName("SignalWrangler().publishPeriodic")
         self.markCalibrationWranglerName = self.stt.makePaddedMarkName("CalibrationWrangler().update")
-        self.markFautWranglerName        = self.stt.makePaddedMarkName("FaultWrangler().update()")
+        self.markFautWranglerName = self.stt.makePaddedMarkName("FaultWrangler().update()")
         self.webserver = webserverConstructorOrNone()
-
 
         self.driveTrain = DrivetrainControl()
         # self.trajectoryCtrl = DrivetrainTrajectoryControl()
-                
+
         self.dInt = DriverInterface()
 
         self.ledCtrl = LEDControl()
 
         self.autoSequencer = AutoSequencer()
         self.autoSequencer.addMode(DriveOut())
-        #self.autoSequencer.addMode(DrivePathCircle())
+        # self.autoSequencer.addMode(DrivePathCircle())
 
         self.dashboard = dashboardOrNone()
+        self.dbg = Debug()
 
         # self.caliVelX = 0.0
         # self.caliVelY = 0.0
@@ -67,7 +68,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.diskStats = DiskStats()
         self.diskStats.update()
-        #self.rioMonitor = None
+        # self.rioMonitor = None
         self.rioMonitor = RIOMonitor(
             runStyle=RUN_PERIODIC_LOOP,
             enableDiskUpdates=False
@@ -86,9 +87,8 @@ class MyRobot(wpilib.TimedRobot):
 
         # Uncomment this and simulate to update the code
         # dependencies graph
-        #from codeStructureReportGen import reportGen
-        #reportGen.generate(self)
-
+        # from codeStructureReportGen import reportGen
+        # reportGen.generate(self)
 
     def robotPeriodic(self):
         gc.disable()
@@ -116,28 +116,28 @@ class MyRobot(wpilib.TimedRobot):
         if self.rioMonitor is not None:
             self.rioMonitor.updateFromPerioidLoop()
         self.stt.mark("rioMonitor.updateFromPerioidLoop()_")
-        #print(f"before:{gc.get_stats()}")
+        # print(f"before:{gc.get_stats()}")
         gc.enable()
-        #gc.collect(generation=0)
-        #self.stt.mark("gc.collect(0)______________________")
-        #gc.collect(generation=1)
-        #self.stt.mark("gc.collect(1)______________________")
-        #gc.collect()
+        # gc.collect(generation=0)
+        # self.stt.mark("gc.collect(0)______________________")
+        # gc.collect(generation=1)
+        # self.stt.mark("gc.collect(1)______________________")
+        # gc.collect()
         self.stt.mark("gc.collect()_______________________")
         gc.disable()
-        #print(f"after:{gc.get_stats()}")
-        #print(
+        # print(f"after:{gc.get_stats()}")
+        # print(
         #    f"after:0:{len(gc.get_objects(generation=0)):5} "
         #    f"1:{len(gc.get_objects(generation=1)):5} "
         #    f"2:{len(gc.get_objects(generation=2)):5}"
-        #)
+        # )
 
         self.stt.end()
-        
+
     #########################################################
     ## Autonomous-Specific init and update
     def autonomousInit(self):
-        
+
         # Start up the autonomous sequencer
         self.autoSequencer.initiaize()
 
@@ -161,27 +161,33 @@ class MyRobot(wpilib.TimedRobot):
         # self.teleConditions.update()
         self.dInt.update()
         if not self.teleConditions.veloTest:
+            self.dbg.print("robot","running game mode")
             self.driveTrain.setCmdFieldRelative(
                 self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
             )
         else:
-            self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"), self.teleConditions.getWheelControl("FR","angle"))
-            self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"), self.teleConditions.getWheelControl("FL","angle"))
-            self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"), self.teleConditions.getWheelControl("BR","angle"))
-            self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"), self.teleConditions.getWheelControl("BL","angle"))
+            self.dbg.print("robot","running game mode")
+            self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
+                                           self.teleConditions.getWheelControl("FR", "angle"))
+            self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
+                                           self.teleConditions.getWheelControl("FL", "angle"))
+            self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"),
+                                           self.teleConditions.getWheelControl("BR", "angle"))
+            self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
+                                           self.teleConditions.getWheelControl("BL", "angle"))
             self.pieceCtrl.update()
         # else:
-            # if (self.trajectoryCtrl.cal
+        # if (self.trajectoryCtrl.cal
         # VelX.isChanged()):
-            #     self.caliVelX = self.trajectoryCtrl.caliVelX.get()
-            # if (self.trajectoryCtrl.caliVelY.isChanged()):
-            #     self.caliVelY = self.trajectoryCtrl.caliVelY.get()
-            # if (self.trajectoryCtrl.caliVelT.isChanged()):
-            #     self.caliVelT = self.trajectoryCtrl.caliVelT.get()
-            # self.driveTrain.setCmdFieldRelative(self.caliVelX,
-            #                                     self.caliVelY,
-            #                                     self.caliVelT
-            #                                     )
+        #     self.caliVelX = self.trajectoryCtrl.caliVelX.get()
+        # if (self.trajectoryCtrl.caliVelY.isChanged()):
+        #     self.caliVelY = self.trajectoryCtrl.caliVelY.get()
+        # if (self.trajectoryCtrl.caliVelT.isChanged()):
+        #     self.caliVelT = self.trajectoryCtrl.caliVelT.get()
+        # self.driveTrain.setCmdFieldRelative(self.caliVelX,
+        #                                     self.caliVelY,
+        #                                     self.caliVelT
+        #                                     )
 
     #########################################################
     ## Disabled-Specific init and update
@@ -209,7 +215,7 @@ def remoteRIODebugSupport():
     if __debug__ and "run" in sys.argv:
         print("Starting Remote Debug Support....")
         try:
-            import debugpy # pylint: disable=import-outside-toplevel
+            import debugpy  # pylint: disable=import-outside-toplevel
         except ModuleNotFoundError:
             pass
         else:

@@ -1,17 +1,20 @@
 from utils.calibration import Calibration
-from utils import constants, faults
-from utils.units import RPM2RadPerSec, m2in
+#from utils import constants, faults
+from utils.units import RPM2RadPerSec
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
+from debugMaster.debug import Debug
 
 class GamePieceCtrl:
     def __init__(self):
+
+        self.dbg = Debug()
 
         # self.INTAKE_L1_CANID = 10
         # self.INTAKE_L2_CANID = 17
         # self.INTAKE_L3_CANID = 18
 
         # self.TRANSFER_L1_CANID = 11
-        self.TRANSFER_L2_CANID = 12
+        self.TRANSFER_L2_CANID = 10 # pylint: disable=invalid-name
 
         # self.SHOOTER_L1_CANID = 13
         # self.SHOOTER_L2_CANID = 14
@@ -47,7 +50,8 @@ class GamePieceCtrl:
 
         # transferL2
         self.transferL2 = WrapperedSparkMax(self.TRANSFER_L2_CANID, "TransferL2")
-        self.transferL2.setPID(0.0026, 0, 0)
+        self.transferL2.setPID(0.0006, 0, 0)
+        #self.transferL2.setVoltage(12.0)
         #self.transferL2.setInverted(False)
 
 
@@ -86,21 +90,21 @@ class GamePieceCtrl:
         self.transferVel = 0.0
         self.shooterVel = 0.0
 
-    def activeIntake(self, desVel):
-        temp = 2
+    def activeIntake(self):
+        pass
         # self.intakeL1.setVelCmd(RPM2RadPerSec(desVel))
         # self.intakeL2.setVelCmd(RPM2RadPerSec(desVel))
         # self.intakeL3.setVelCmd(RPM2RadPerSec(desVel))
 
     def activeTransfer(self, desVel):
-        if abs(desVel)>0:
+        if abs(desVel) > 0:
             self.transferL2.setVelCmd(RPM2RadPerSec(desVel))
         else:
-            self.transferL2.setVoltage(0.0)
+            self.transferL2.setVelCmd(0.0)
         #self.transferL1.setVelCmd(RPM2RadPerSec(desVel))
 
-    def activeShooter(self, desVel):
-        temp = 2
+    def activeShooter(self):
+        pass
         # self.shooterR1.setVelCmd(RPM2RadPerSec(desVel))
         # self.shooterL1.setVelCmd(RPM2RadPerSec(desVel))
         # self.shooterR2.setVelCmd(RPM2RadPerSec(desVel))
@@ -113,3 +117,4 @@ class GamePieceCtrl:
         self.activeTransfer(temp)
         # self.activeIntake(self.intakeVel)
         # self.activeShooter(self.shooterVel)
+        self.dbg.print("piece", self.transferL2.getMotorVelocityRadPerSec())
