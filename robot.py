@@ -61,6 +61,8 @@ class MyRobot(wpilib.TimedRobot):
 
         self.dashboard = dashboardOrNone()
         self.dbg = Debug()
+        self.dbg.toPrint.update({'velState':False})
+        self.dbg.toPrint.update({'sparkUpdates':True})
 
         # self.caliVelX = 0.0
         # self.caliVelY = 0.0
@@ -89,6 +91,7 @@ class MyRobot(wpilib.TimedRobot):
         # dependencies graph
         # from codeStructureReportGen import reportGen
         # reportGen.generate(self)
+
 
     def robotPeriodic(self):
         gc.disable()

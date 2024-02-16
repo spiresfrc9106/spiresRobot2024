@@ -13,6 +13,7 @@ from AutoSequencerV2.modeList import ModeList
 from AutoSequencerV2.builtInCtrl.caliCtrl import CaliCtrl
 from AutoSequencerV2.builtInCtrl.xboxCtrl import XboxCtrl
 from AutoSequencerV2.sequentialCommandGroup import SequentialCommandGroup
+from debugMaster.debug import Debug
 
 
 class Wheel:
@@ -42,6 +43,7 @@ class TeleConditions(metaclass=Singleton):
         # This variable is used to help track when alliance changes
         self._prevOnRed = onRed()
         self.veloTest = False
+        self.updateCount = 0
 
         self.updateMode(force=True)  # Ensure we load the teleop conditions at least once.
 
@@ -49,6 +51,8 @@ class TeleConditions(metaclass=Singleton):
     # Call this periodically while disabled to keep the dashboard updated
     # and, when things change, re-init modes
     def updateMode(self, force=False):
+        self.updateCount = self.updateCount+1
+        Debug().print('velState', f"in TeleConditions.updateMode {self.updateCount}")
         ctrlChanged = self.ctrlModeList.updateMode()
         if ctrlChanged or force:
             ctrlMode = self.ctrlModeList.getCurMode()
@@ -57,6 +61,7 @@ class TeleConditions(metaclass=Singleton):
                 self.veloTest = True
             else:
                 self.veloTest = False
+            Debug().print('velState', f"veloTest={self.veloTest}")
             print(
                 f"[Tele] New Modes Selected:  {ctrlMode.getName()}"
             )
