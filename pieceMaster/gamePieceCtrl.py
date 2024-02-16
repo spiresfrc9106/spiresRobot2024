@@ -1,6 +1,6 @@
 from utils.calibration import Calibration
 #from utils import constants, faults
-from utils.units import RPM2RadPerSec
+from utils.units import RPM2RadPerSec, radPerSec2RPM
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from debugMaster.debug import Debug
 from utils.singleton import Singleton
@@ -50,8 +50,13 @@ class GamePieceCtrl(metaclass=Singleton):
 
 
         # transferL2
-        self.transferL2 = WrapperedSparkMax(self.TRANSFER_L2_CANID, "TransferL2")
-        self.transferL2.setPID(0.00005, 0.0, 0.0)
+        self.transferL2 = WrapperedSparkMax(self.TRANSFER_L2_CANID, "TransferL2", False)
+        self.transferL2.setInverted(False)
+        self.transferL2.setPID(2e-4, 1.0/1000.0/1000.0, 0.0)
+        #still rang self.transferL2.setPID(2e-4, 0.0, 0.0)
+        #this rang: self.transferL2.setPID(6e-4, 0.0, 0.0)
+        #this worked: self.transferL2.setPID(6e-5, 0.0, 0.0)
+        #self.transferL2.setPID(0.00005, 0.0, 0.0)
         Debug().print('sparkUpdates','self.transferL2.setPID(0.00005, 0.0, 0.0)')
         #self.transferL2.setPID(0.0006, 0, 0)
         #0.00005
@@ -87,7 +92,7 @@ class GamePieceCtrl(metaclass=Singleton):
         #self.shooterkPCal = Calibration("ShooterkP", 0)
 
         self.intakeVelCal = Calibration("Wheel Intake Velocity", 0.0, "RPM")
-        self.transferVelCal = Calibration("Wheel Transfer Velocity", 0.0, "RPM")
+        self.transferVelCal = Calibration("Wheel Transfer Velocity", 60.0, "RPM")
         self.shooterVelCal = Calibration("Wheel Shooter Velocity", 0.0, "RPM")
 
         self.intakeVel = 0.0
@@ -103,8 +108,9 @@ class GamePieceCtrl(metaclass=Singleton):
 
     def activeTransfer(self):
         desVelRpm = self.transferVelCal.get()
-        desVelRpm = 120.0
-        self.transferL2.setVelCmd(RPM2RadPerSec(desVelRpm))
+        self.transferL2.setVelCmd(RPM2RadPerSec(desVelRpm),0.01) # We need some feed forward
+        # this worked with a kP of 6e-5 self.transferL2.setVelCmd(RPM2RadPerSec(desVelRpm),0.000015) # We need some feed forward
+        self.transferL2.getMotorVelocityRadPerSec()
         self.dbg.print('sparkUpdates',f'desVleRpm={desVelRpm}')
         #self.transferL1.setVelCmd(RPM2RadPerSec(desVel))
 
