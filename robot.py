@@ -175,20 +175,20 @@ class MyRobot(wpilib.TimedRobot):
 
     #########################################################
     ## Test-Specific init and update
-    def testInit(self):
-        self.dbg.print("robot", "test mode initiated")
-
-    def testPeriodic(self):
-        self.dbg.print("robot", "running test mode")
-        self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
-                                       self.teleConditions.getWheelControl("FR", "angle"))
-        self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
-                                       self.teleConditions.getWheelControl("FL", "angle"))
-        self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"),
-                                       self.teleConditions.getWheelControl("BR", "angle"))
-        self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
-                                       self.teleConditions.getWheelControl("BL", "angle"))
-        self.pieceCtrl.update()
+    # def testInit(self):
+    #     self.dbg.print("robot", "test mode initiated")
+    #
+    # def testPeriodic(self):
+    #     self.dbg.print("robot", "running test mode")
+    #     self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
+    #                                    self.teleConditions.getWheelControl("FR", "angle"))
+    #     self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
+    #                                    self.teleConditions.getWheelControl("FL", "angle"))
+    #     self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"),
+    #                                    self.teleConditions.getWheelControl("BR", "angle"))
+    #     self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
+    #                                    self.teleConditions.getWheelControl("BL", "angle"))
+    #     self.pieceCtrl.update()
 
     #########################################################
     ## Cleanup
