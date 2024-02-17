@@ -63,6 +63,7 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg = Debug()
         self.dbg.toPrint.update({'velState':False})
         self.dbg.toPrint.update({'sparkUpdates':True})
+        self.dbg.toPrint.update({'hi':True})
 
         # self.caliVelX = 0.0
         # self.caliVelY = 0.0
@@ -161,36 +162,9 @@ class MyRobot(wpilib.TimedRobot):
         pass
 
     def teleopPeriodic(self):
-        # self.teleConditions.update()
-        self.dInt.update()
-        if not self.teleConditions.veloTest:
-            self.dbg.print("robot","running game mode")
-            self.driveTrain.setCmdFieldRelative(
-                self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd()
-            )
-        else:
-            self.dbg.print("robot","running game mode")
-            self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
-                                           self.teleConditions.getWheelControl("FR", "angle"))
-            self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
-                                           self.teleConditions.getWheelControl("FL", "angle"))
-            self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"),
-                                           self.teleConditions.getWheelControl("BR", "angle"))
-            self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
-                                           self.teleConditions.getWheelControl("BL", "angle"))
-            self.pieceCtrl.update()
-        # else:
-        # if (self.trajectoryCtrl.cal
-        # VelX.isChanged()):
-        #     self.caliVelX = self.trajectoryCtrl.caliVelX.get()
-        # if (self.trajectoryCtrl.caliVelY.isChanged()):
-        #     self.caliVelY = self.trajectoryCtrl.caliVelY.get()
-        # if (self.trajectoryCtrl.caliVelT.isChanged()):
-        #     self.caliVelT = self.trajectoryCtrl.caliVelT.get()
-        # self.driveTrain.setCmdFieldRelative(self.caliVelX,
-        #                                     self.caliVelY,
-        #                                     self.caliVelT
-        #                                     )
+        self.dbg.print("robot", "running game mode")
+        self.dbg.print("hi", self.dInt.getVxCmd())
+        self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
     #########################################################
     ## Disabled-Specific init and update
@@ -202,8 +176,19 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Test-Specific init and update
     def testInit(self):
-        # TEST only - Induce a crash
-        oopsie = 5 / 0.0  # pylint: disable=unused-variable
+        self.dbg.print("robot", "test mode initiated")
+
+    def testPeriodic(self):
+        self.dbg.print("robot", "running test mode")
+        self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
+                                       self.teleConditions.getWheelControl("FR", "angle"))
+        self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
+                                       self.teleConditions.getWheelControl("FL", "angle"))
+        self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"),
+                                       self.teleConditions.getWheelControl("BR", "angle"))
+        self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
+                                       self.teleConditions.getWheelControl("BL", "angle"))
+        self.pieceCtrl.update()
 
     #########################################################
     ## Cleanup

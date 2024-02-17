@@ -1,9 +1,18 @@
 from utils.calibration import Calibration
-#from utils import constants, faults
 from utils.units import RPM2RadPerSec
+from utils.singleton import Singleton
+#from utils import constants, faults
+
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from debugMaster.debug import Debug
-from utils.singleton import Singleton
+
+#
+# class SparkPower:
+#     def __init__(self, wrappedSparkMax):
+#         pass
+#         ##varialbes
+#     def
+#
 
 class GamePieceCtrl(metaclass=Singleton):
     def __init__(self):
@@ -103,7 +112,6 @@ class GamePieceCtrl(metaclass=Singleton):
 
     def activeTransfer(self):
         desVelRpm = self.transferVelCal.get()
-        desVelRpm = 120.0
         self.transferL2.setVelCmd(RPM2RadPerSec(desVelRpm))
         self.dbg.print('sparkUpdates',f'desVleRpm={desVelRpm}')
         #self.transferL1.setVelCmd(RPM2RadPerSec(desVel))
