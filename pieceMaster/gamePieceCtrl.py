@@ -6,13 +6,16 @@ from utils.singleton import Singleton
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from debugMaster.debug import Debug
 
-#
-# class SparkPower:
-#     def __init__(self, wrappedSparkMax):
-#         pass
-#         ##varialbes
-#     def
-#
+
+class SparkCtrl:
+    def __init__(self, canID: int, name, breakMode: bool=False, kP: float=0.0, kI: float=0.0, kD: float=0.0):
+        # we expect users of this class to directly access the motor controller
+        self.ctrl = WrapperedSparkMax(canID=canID, name=name, breakMode=breakMode)
+        self.ctrl.setPID(kP=kP, kI=kI, kD=kD)
+
+    def update(self):
+        self.ctrl.getMotorVelocityRadPerSec()
+
 
 class GamePieceCtrl(metaclass=Singleton):
     def __init__(self):
@@ -59,9 +62,16 @@ class GamePieceCtrl(metaclass=Singleton):
 
 
         # transferL2
-        self.transferL2 = WrapperedSparkMax(self.TRANSFER_L2_CANID, "TransferL2")
-        self.transferL2.setPID(0.00005, 0.0, 0.0)
+        self.transferL2 = SparkCtrl(
+            canID=self.TRANSFER_L2_CANID,
+            name="TransferL2",
+            kP=0.00005,
+            kI=0.0,
+            kD=0.0,
+        )
+
         Debug().print('sparkUpdates','self.transferL2.setPID(0.00005, 0.0, 0.0)')
+        self.sparkL2 = SparkCtrl(self.transferL2)
         #self.transferL2.setPID(0.0006, 0, 0)
         #0.00005
         #self.transferL2.setVoltage(12.0)
@@ -71,8 +81,8 @@ class GamePieceCtrl(metaclass=Singleton):
         # Shooter Motors
 
         # # shooterL1
-        # self.shooterL1 = WrapperedSparkMax(self.SHOOTER_L1_CANID, "ShooterL1")
-        # self.shooterL1.setPID(0.00005, 0, 0)
+        self.shooterL1 = WrapperedSparkMax(self.SHOOTER_L1_CANID, "ShooterL1")
+        self.shooterL1.setPID(0.00005, 0, 0)
         # self.shooterL1.setVoltage(12)
         # #self.shooterL1.setInverted(False)
         # # shooterR1
@@ -112,7 +122,7 @@ class GamePieceCtrl(metaclass=Singleton):
 
     def activeTransfer(self):
         desVelRpm = self.transferVelCal.get()
-        self.transferL2.setVelCmd(RPM2RadPerSec(desVelRpm))
+        self.transferL2.ctrl.setVelCmd(RPM2RadPerSec(desVelRpm),0.0)
         self.dbg.print('sparkUpdates',f'desVleRpm={desVelRpm}')
         #self.transferL1.setVelCmd(RPM2RadPerSec(desVel))
 
