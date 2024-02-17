@@ -1,5 +1,5 @@
 from utils.calibration import Calibration
-from utils.units import RPM2RadPerSec
+from utils.units import RPM2RadPerSec, radPerSec2RPM
 from utils.singleton import Singleton
 #from utils import constants, faults
 
@@ -65,12 +65,12 @@ class GamePieceCtrl(metaclass=Singleton):
         self.transferL2 = SparkCtrl(
             canID=self.TRANSFER_L2_CANID,
             name="TransferL2",
-            kP=0.00005,
-            kI=0.0,
+            kP=2e-4,
+            kI=1.0/1000.0/1000.0,
             kD=0.0,
         )
 
-        Debug().print('sparkUpdates','self.transferL2.setPID(0.00005, 0.0, 0.0)')
+        Debug().print('sparkUpdates','self.transferL2.setPID(2e-4, 1/1000/1000, 0.0)')
         self.sparkL2 = SparkCtrl(self.transferL2)
         #self.transferL2.setPID(0.0006, 0, 0)
         #0.00005
@@ -106,7 +106,7 @@ class GamePieceCtrl(metaclass=Singleton):
         #self.shooterkPCal = Calibration("ShooterkP", 0)
 
         self.intakeVelCal = Calibration("Wheel Intake Velocity", 0.0, "RPM")
-        self.transferVelCal = Calibration("Wheel Transfer Velocity", 0.0, "RPM")
+        self.transferVelCal = Calibration("Wheel Transfer Velocity", 60.0, "RPM")
         self.shooterVelCal = Calibration("Wheel Shooter Velocity", 0.0, "RPM")
 
         self.intakeVel = 0.0
@@ -122,8 +122,13 @@ class GamePieceCtrl(metaclass=Singleton):
 
     def activeTransfer(self):
         desVelRpm = self.transferVelCal.get()
-        self.transferL2.ctrl.setVelCmd(RPM2RadPerSec(desVelRpm),0.0)
+        self.transferL2.ctrl.setVelCmd(RPM2RadPerSec(desVelRpm), 0.0)
         self.dbg.print('sparkUpdates',f'desVleRpm={desVelRpm}')
+
+        #self.transferL2.ctrl.setVelCmd(RPM2RadPerSec(desVelRpm), 0.01)  # We need some feed forward
+        # this worked with a kP of 6e-5 self.transferL2.setVelCmd(RPM2RadPerSec(desVelRpm),0.000015)
+        # need some feed forward
+
         #self.transferL1.setVelCmd(RPM2RadPerSec(desVel))
 
     def activeShooter(self):
