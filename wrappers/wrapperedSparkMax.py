@@ -10,7 +10,8 @@ from utils.faults import Fault
 # Physical unit conversions into SI units (radians)
 # Retry logic for initial configuration
 # Fault handling for not crashing code if the motor controller is disconnected
-# Fault annunication logic to trigger warnings if a motor couldn't be configured
+# Fault annunciation logic to trigger warnings if a motor couldn't be configured
+
 class WrapperedSparkMax:
     def __init__(self, canID, name, brakeMode=False):
         self.ctrl = CANSparkMax(canID, CANSparkLowLevel.MotorType.kBrushless)
@@ -126,6 +127,9 @@ class WrapperedSparkMax:
         else:
             output = 0
         output = 12 * output
-        log(self.name + "_estOutputV", output, "")
+        log(self.name + "_estOutputV", output, "V")
         return output
 
+    def setSmartCurrentLimit():
+        # @yavin get to this
+        pass
