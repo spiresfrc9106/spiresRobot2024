@@ -62,8 +62,9 @@ class MyRobot(wpilib.TimedRobot):
         self.dashboard = dashboardOrNone()
         self.dbg = Debug()
         self.dbg.toPrint.update({'velState':False})
-        self.dbg.toPrint.update({'sparkUpdates':True})
-        self.dbg.toPrint.update({'hi':True})
+        self.dbg.toPrint.update({'sparkUpdates':False})
+        self.dbg.toPrint.update({'hi':False})
+        self.dbg.toPrint.update({'test':True})
 
         # self.caliVelX = 0.0
         # self.caliVelY = 0.0
@@ -141,6 +142,7 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Autonomous-Specific init and update
     def autonomousInit(self):
+        self.pieceCtrl.update(False)
 
         # Start up the autonomous sequencer
         self.autoSequencer.initiaize()
@@ -152,6 +154,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def autonomousPeriodic(self):
         self.autoSequencer.update()
+        self.pieceCtrl.update(False)
 
     def autonomousExit(self):
         self.autoSequencer.end()
@@ -159,11 +162,12 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Teleop-Specific init and update
     def teleopInit(self):
-        pass
+        self.pieceCtrl.update(False)
 
     def teleopPeriodic(self):
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", self.dInt.getVxCmd())
+        self.pieceCtrl.update(False)
         self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
     #########################################################
@@ -180,6 +184,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def testPeriodic(self):
         self.dbg.print("robot", "running test mode")
+        self.pieceCtrl.update(True)
         self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
                                        self.teleConditions.getWheelControl("FR", "angle"))
         self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
@@ -188,7 +193,9 @@ class MyRobot(wpilib.TimedRobot):
                                        self.teleConditions.getWheelControl("BR", "angle"))
         self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
                                        self.teleConditions.getWheelControl("BL", "angle"))
-        self.pieceCtrl.update()
+
+    def testExit(self):
+        self.pieceCtrl.update(False)
 
     #########################################################
     ## Cleanup

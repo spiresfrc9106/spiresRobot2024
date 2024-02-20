@@ -1,5 +1,5 @@
 from utils.calibration import Calibration
-from utils.units import RPM2RadPerSec, radPerSec2RPM
+from utils.units import RPM2RadPerSec #,radPerSec2RPM
 from utils.singleton import Singleton
 #from utils import constants, faults
 
@@ -8,13 +8,14 @@ from debugMaster.debug import Debug
 
 
 class SparkCtrl:
-    def __init__(self, canID: int, name, breakMode: bool=False, kP: float=0.0, kI: float=0.0, kD: float=0.0):
+    def __init__(self, canID: int, name, brakeMode: bool=False, kP: float=0.0, kI: float=0.0, kD: float=0.0):
         # we expect users of this class to directly access the motor controller
-        self.ctrl = WrapperedSparkMax(canID=canID, name=name, breakMode=breakMode)
+        self.ctrl = WrapperedSparkMax(canID=canID, name=name, brakeMode=brakeMode)
         self.ctrl.setPID(kP=kP, kI=kI, kD=kD)
 
     def update(self):
         self.ctrl.getMotorVelocityRadPerSec()
+        self.ctrl.getAppliedOutput()
 
 
 class GamePieceCtrl(metaclass=Singleton):
@@ -28,6 +29,7 @@ class GamePieceCtrl(metaclass=Singleton):
 
         # self.TRANSFER_L1_CANID = 11
         self.TRANSFER_L2_CANID = 12 # pylint: disable=invalid-name
+        self.TRANSFER_L1_CANID = 10 # pylint: disable=invalid-name
 
         # self.SHOOTER_L1_CANID = 13
         # self.SHOOTER_L2_CANID = 14
@@ -61,17 +63,27 @@ class GamePieceCtrl(metaclass=Singleton):
         # #self.transferL1.setInverted(False)
 
 
+
+        self.transferL1 = SparkCtrl(
+            canID=self.TRANSFER_L1_CANID,
+            name="TransferL1",
+            brakeMode=False,
+            kP=1.5e-4,
+            kI=0.0,
+            kD=0.0,
+        )
+
         # transferL2
         self.transferL2 = SparkCtrl(
             canID=self.TRANSFER_L2_CANID,
             name="TransferL2",
-            kP=2e-4,
-            kI=1.0/1000.0/1000.0,
+            brakeMode=False,
+            kP=1.5e-4,
+            kI=0.0,
             kD=0.0,
         )
-
+        #1.0/1000.0/1000.0 was ki
         Debug().print('sparkUpdates','self.transferL2.setPID(2e-4, 1/1000/1000, 0.0)')
-        self.sparkL2 = SparkCtrl(self.transferL2)
         #self.transferL2.setPID(0.0006, 0, 0)
         #0.00005
         #self.transferL2.setVoltage(12.0)
@@ -81,8 +93,8 @@ class GamePieceCtrl(metaclass=Singleton):
         # Shooter Motors
 
         # # shooterL1
-        self.shooterL1 = WrapperedSparkMax(self.SHOOTER_L1_CANID, "ShooterL1")
-        self.shooterL1.setPID(0.00005, 0, 0)
+        # self.shooterL1 = WrapperedSparkMax(self.SHOOTER_L1_CANID, "ShooterL1")
+        # self.shooterL1.setPID(0.00005, 0, 0)
         # self.shooterL1.setVoltage(12)
         # #self.shooterL1.setInverted(False)
         # # shooterR1
@@ -105,14 +117,9 @@ class GamePieceCtrl(metaclass=Singleton):
         #self.shooterkFCal = Calibration("ShooterkF", 0.00255, "V/RPM")
         #self.shooterkPCal = Calibration("ShooterkP", 0)
 
-        self.intakeVelCal = Calibration("Wheel Intake Velocity", 0.0, "RPM")
-        self.transferVelCal = Calibration("Wheel Transfer Velocity", 60.0, "RPM")
-        self.shooterVelCal = Calibration("Wheel Shooter Velocity", 0.0, "RPM")
-
-        self.intakeVel = 0.0
-        self.transferVel = 0.0
-        self.shooterVel = 0.0
-        self.count = 0
+        self.intakeVelCal = Calibration("Wheel Intake Velocity", 0.0, "RPS")
+        self.transferVelCal = Calibration("Wheel Transfer Velocity", 100.0, "RPS")
+        self.shooterVelCal = Calibration("Wheel Shooter Velocity", 0.0, "RPS")
 
     def activeIntake(self):
         pass
@@ -120,10 +127,11 @@ class GamePieceCtrl(metaclass=Singleton):
         # self.intakeL2.setVelCmd(RPM2RadPerSec(desVel))
         # self.intakeL3.setVelCmd(RPM2RadPerSec(desVel))
 
-    def activeTransfer(self):
-        desVelRpm = self.transferVelCal.get()
-        self.transferL2.ctrl.setVelCmd(RPM2RadPerSec(desVelRpm), 0.0)
-        self.dbg.print('sparkUpdates',f'desVleRpm={desVelRpm}')
+    def activeTransfer(self, desVelRps, aff=0.0):
+        self.transferL1.ctrl.setVelCmd(velCmd=RPM2RadPerSec(60*desVelRps), arbFF=aff)
+        self.transferL2.ctrl.setVelCmd(velCmd=RPM2RadPerSec(60*desVelRps), arbFF=aff)
+
+        self.dbg.print('sparkUpdates', f'desVleRps={desVelRps}')
 
         #self.transferL2.ctrl.setVelCmd(RPM2RadPerSec(desVelRpm), 0.01)  # We need some feed forward
         # this worked with a kP of 6e-5 self.transferL2.setVelCmd(RPM2RadPerSec(desVelRpm),0.000015)
@@ -133,16 +141,32 @@ class GamePieceCtrl(metaclass=Singleton):
 
     def activeShooter(self):
         pass
+        #temporary placeholder
         # self.shooterR1.setVelCmd(RPM2RadPerSec(desVel))
         # self.shooterL1.setVelCmd(RPM2RadPerSec(desVel))
         # self.shooterR2.setVelCmd(RPM2RadPerSec(desVel))
         # self.shooterL2.setVelCmd(RPM2RadPerSec(desVel))
 
-    def update(self):
-        self.count = self.count + 1
+    def shooterAFF(self, rps):
+        ## y = 0.12x + 0.10
+        ## where x is in RPS and y is volts
+        x = rps
+        m = 0.12
+        b = 0.10
+        return m*x+b
+
+    def update(self, run:bool):
+        if self.transferVelCal.isChanged():
+            self.dbg.print("test", self.transferVelCal.get())
         # self.intakeVel = self.intakeVelCal.get()
         # self.shooterVel = self.shooterVelCal.get()
-        self.activeTransfer()
+        if run:
+            vel = self.transferVelCal.get()
+            self.activeTransfer(desVelRps=vel, aff=self.shooterAFF(vel))
+        else:
+            self.activeTransfer(desVelRps=0)
+
+        self.transferL1.update()
+        self.transferL2.update()
         # self.activeIntake(self.intakeVel)
         # self.activeShooter(self.shooterVel)
-        self.dbg.print("piece", self.transferL2.getMotorVelocityRadPerSec())

@@ -9,6 +9,7 @@ from drivetrain.drivetrainPhysical import MAX_TRANSLATE_ACCEL_MPS2
 from utils.faults import Fault
 from utils.signalLogging import log
 from utils.allianceTransformUtils import onRed
+from wpilib import Joystick
 
 class DriverInterface:
     """Class to gather input from the driver of the robot"""
@@ -16,6 +17,8 @@ class DriverInterface:
     def __init__(self):
         ctrlIdx = 0
         self.ctrl = XboxController(ctrlIdx)
+        self.aimer = Joystick(0)
+
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
@@ -27,6 +30,7 @@ class DriverInterface:
         self.velTSlewRateLimiter = SlewRateLimiter(
             rateLimit=MAX_ROTATE_ACCEL_RAD_PER_SEC_2
         )
+
 
     def update(self):
         """Main update - call this once every 20ms"""
