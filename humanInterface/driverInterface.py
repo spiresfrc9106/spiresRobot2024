@@ -1,4 +1,5 @@
 from wpilib import XboxController
+# from wpilib import Joystick
 from wpimath import applyDeadband
 from wpimath.filter import SlewRateLimiter
 from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS
@@ -9,22 +10,25 @@ from drivetrain.drivetrainPhysical import MAX_TRANSLATE_ACCEL_MPS2
 from utils.faults import Fault
 from utils.signalLogging import log
 from utils.allianceTransformUtils import onRed
-from wpilib import Joystick
+from utils.singleton import Singleton
 
-class DriverInterface:
+class DriverInterface(metaclass=Singleton):
     """Class to gather input from the driver of the robot"""
 
     def __init__(self):
-        ctrlIdx = 0
-        self.ctrl = XboxController(ctrlIdx)
-        self.aimer = Joystick(0)
+        driveIdx = 0
+        self.drive = XboxController(driveIdx)
+
+        aimerIdx = 1
+        self.aimer = XboxController(aimerIdx)
+        # self.aimer = Joystick(0)
 
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
+        self.initIntake = False
         self.gyroResetCmd = False
-        self.connectedFault = Fault(f"Driver XBox Controller ({ctrlIdx}) Unplugged")
-
+        self.connectedFault = Fault(f"Driver XBox Controller ({driveIdx}) Unplugged")
         self.velXSlewRateLimiter = SlewRateLimiter(rateLimit=MAX_TRANSLATE_ACCEL_MPS2)
         self.velYSlewRateLimiter = SlewRateLimiter(rateLimit=MAX_TRANSLATE_ACCEL_MPS2)
         self.velTSlewRateLimiter = SlewRateLimiter(
@@ -32,16 +36,17 @@ class DriverInterface:
         )
 
 
+
     def update(self):
         """Main update - call this once every 20ms"""
 
-        if self.ctrl.isConnected():
+        if self.drive.isConnected():
             # Only attempt to read from the joystick if it's plugged in
 
             # Convert from joystic sign/axis conventions to robot velocity conventions
-            vXJoyRaw = -1.0 * self.ctrl.getLeftY()
-            vYJoyRaw = -1.0 * self.ctrl.getLeftX()
-            vTJoyRaw = -1.0 * self.ctrl.getRightX()
+            vXJoyRaw = -1.0 * self.drive.getLeftY()
+            vYJoyRaw = -1.0 * self.drive.getLeftX()
+            vTJoyRaw = -1.0 * self.drive.getRightX()
 
             # Apply deadband to make sure letting go of the joystick actually stops the bot
             vXJoy = applyDeadband(vXJoyRaw, 0.15)
@@ -50,7 +55,7 @@ class DriverInterface:
 
             # Normally robot goes half speed - unlock full speed on
             # sprint command being active
-            sprintMult = 1.0 if (self.ctrl.getRightBumper()) else 0.5
+            sprintMult = 1.0 if (self.drive.getRightBumper()) else 0.5
 
             # Convert joystick fractions into physical units of velocity
             velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * sprintMult
@@ -69,7 +74,7 @@ class DriverInterface:
                 self.velYCmd *= -1
 
             
-            self.gyroResetCmd = self.ctrl.getAButtonPressed()
+            self.gyroResetCmd = self.drive.getAButtonPressed()
 
             self.connectedFault.setNoFault()
         else:
@@ -80,10 +85,15 @@ class DriverInterface:
             self.gyroResetCmd = False
             self.connectedFault.setFaulted()
 
+        if self.aimer.isConnected():
+            self.initIntake = self.aimer.getYButtonPressed()
+        else:
+            self.initIntake = False
+
         log("DI FwdRev Cmd", self.velXCmd, "mps")
         log("DI Strafe Cmd", self.velYCmd, "mps")
         log("DI Rotate Cmd", self.velTCmd, "radPerSec")
-        log("DI connected", self.ctrl.isConnected(), "bool")
+        log("DI connected", self.drive.isConnected(), "bool")
 
     def getVxCmd(self):
         """
@@ -105,6 +115,9 @@ class DriverInterface:
             float: Driver's current vT (rotation) command in radians per second
         """
         return self.velTCmd
+
+    def getIntakeActive(self):
+        return self.initIntake
 
     def getGyroResetCmd(self):
         """_summary_

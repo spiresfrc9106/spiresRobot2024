@@ -17,9 +17,10 @@ from utils.rioMonitor import RIOMonitor
 from utils.rioMonitor import DiskStats, RUN_PERIODIC_LOOP
 from utils.singleton import destroyAllSingletonInstances
 from AutoSequencerV2.autoSequencer import AutoSequencer
-from AutoSequencerV2.teleopConditions import TeleConditions
-from pieceMaster.gamePieceCtrl import GamePieceCtrl
+# from AutoSequencerV2.teleopConditions import TeleConditions
+# from pieceMaster.gamePieceCtrl import GamePieceCtrl
 from debugMaster.debug import Debug
+from noteMaster.noteHandler import NoteHandler
 
 
 class MyRobot(wpilib.TimedRobot):
@@ -65,6 +66,7 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.toPrint.update({'sparkUpdates':False})
         self.dbg.toPrint.update({'hi':False})
         self.dbg.toPrint.update({'test':True})
+        self.dbg.toPrint.update({'note':True})
 
         # self.caliVelX = 0.0
         # self.caliVelY = 0.0
@@ -86,8 +88,9 @@ class MyRobot(wpilib.TimedRobot):
         print(f"after:1:{len(gc.get_objects(generation=1))}")
         print(f"after:2:{len(gc.get_objects(generation=2))}")
 
-        self.teleConditions = TeleConditions()
-        self.pieceCtrl = GamePieceCtrl()
+        self.noteHandler = NoteHandler()
+        #self.teleConditions = TeleConditions()
+        #self.pieceCtrl = GamePieceCtrl()
 
         # Uncomment this and simulate to update the code
         # dependencies graph
@@ -110,6 +113,8 @@ class MyRobot(wpilib.TimedRobot):
         self.driveTrain.update()
         self.stt.perhapsMark(self.markDriveTrainName)
         self.ledCtrl.update()
+
+        self.noteHandler.update()
 
         SignalWrangler().publishPeriodic()
         self.stt.perhapsMark(self.markSignalWranglerName)
@@ -142,7 +147,7 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Autonomous-Specific init and update
     def autonomousInit(self):
-        self.pieceCtrl.update(False)
+        # self.pieceCtrl.update(False)
 
         # Start up the autonomous sequencer
         self.autoSequencer.initiaize()
@@ -154,7 +159,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def autonomousPeriodic(self):
         self.autoSequencer.update()
-        self.pieceCtrl.update(False)
+        # self.pieceCtrl.update(False)
 
     def autonomousExit(self):
         self.autoSequencer.end()
@@ -162,19 +167,25 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Teleop-Specific init and update
     def teleopInit(self):
-        self.pieceCtrl.update(False)
+        # self.pieceCtrl.update(False)
+        pass
 
     def teleopPeriodic(self):
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", self.dInt.getVxCmd())
-        self.pieceCtrl.update(False)
+        # self.pieceCtrl.update(False)
         self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
+        if True: #self.dInt.getIntakeActive():
+            self.noteHandler.intakeCmd = True
+        else:
+            self.noteHandler.intakeCmd = False
+
 
     #########################################################
     ## Disabled-Specific init and update
     def disabledPeriodic(self):
         self.driveTrain.trajCtrl.updateCals()
-        self.teleConditions.updateMode()
+        #self.teleConditions.updateMode()
         self.autoSequencer.updateMode()
 
     #########################################################
@@ -184,18 +195,19 @@ class MyRobot(wpilib.TimedRobot):
 
     def testPeriodic(self):
         self.dbg.print("robot", "running test mode")
-        self.pieceCtrl.update(True)
-        self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
-                                       self.teleConditions.getWheelControl("FR", "angle"))
-        self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
-                                       self.teleConditions.getWheelControl("FL", "angle"))
-        self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"),
-                                       self.teleConditions.getWheelControl("BR", "angle"))
-        self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
-                                       self.teleConditions.getWheelControl("BL", "angle"))
+        # self.pieceCtrl.update(True)
+        # self.driveTrain.setModuleState("FR", self.teleConditions.getWheelControl("FR", "velocity"),
+        #                                self.teleConditions.getWheelControl("FR", "angle"))
+        # self.driveTrain.setModuleState("FL", self.teleConditions.getWheelControl("FL", "velocity"),
+        #                                self.teleConditions.getWheelControl("FL", "angle"))
+        # self.driveTrain.setModuleState("BR", self.teleConditions.getWheelControl("BR", "velocity"),
+        #                                self.teleConditions.getWheelControl("BR", "angle"))
+        # self.driveTrain.setModuleState("BL", self.teleConditions.getWheelControl("BL", "velocity"),
+        #                                self.teleConditions.getWheelControl("BL", "angle"))
 
     def testExit(self):
-        self.pieceCtrl.update(False)
+        # self.pieceCtrl.update(False)
+        pass
 
     #########################################################
     ## Cleanup

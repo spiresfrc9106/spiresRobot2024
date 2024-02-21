@@ -2,7 +2,6 @@ from rev import CANSparkMax, SparkMaxPIDController, REVLibError, CANSparkLowLeve
 from utils.signalLogging import log
 from utils.units import rev2Rad, radPerSec2RPM, RPM2RadPerSec
 from utils.faults import Fault
-from utils.units import RPM2RadPerSec
 
 
 ## Wrappered Spark Max
@@ -96,10 +95,15 @@ class WrapperedSparkMax:
         log(self.name + "_arbFF", arbFF, "V")
         self._logCurrent()
 
-    def setVelRPS(self, speed):
+    def setVelRPS(self, speed, aff=0.0):
         rpm = 60 * speed
         command = RPM2RadPerSec(rpm)
-        self.setVelCmd(command)
+        self.setVelCmd(command, arbFF=aff)
+
+    def getVelRPS(self):
+        rpm = radPerSec2RPM(self.getMotorVelocityRadPerSec())
+        rps = rpm / 60
+        return rps
 
     def setVoltage(self, outputVoltageVolts):
         log(self.name + "_cmdVoltage", outputVoltageVolts, "V")
@@ -136,6 +140,5 @@ class WrapperedSparkMax:
         log(self.name + "_estOutputV", output, "V")
         return output
 
-    def setSmartCurrentLimit():
-        # @yavin get to this
+    def setSmartCurrentLimit(self):
         pass
