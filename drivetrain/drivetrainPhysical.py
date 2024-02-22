@@ -22,8 +22,8 @@ Defines the physical dimensions and characteristics of the drivetrain
 
 # Wheel base half width: Distance from the center of the frame rail
 # out to the center of the "contact patch" where the wheel meets the ground
-WHEEL_BASE_HALF_WIDTH_M = inchesToMeters(16.5 / 2.0)
-WHEEL_BASE_HALF_LENGTH_M = inchesToMeters(26.5 / 2.0)
+WHEEL_BASE_HALF_WIDTH_M = inchesToMeters(26.5 / 2.0)
+WHEEL_BASE_HALF_LENGTH_M = inchesToMeters(22.5 / 2.0)
 
 # Additional distance from the wheel contact patch out to the edge of the bumper
 BUMPER_THICKNESS_M = inchesToMeters(2.5)
@@ -103,10 +103,10 @@ MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = (
 # 3 - Using a square, twist the modules by hand until they are aligned with the robot's chassis
 # 4 - Read out the encoder readings for each module, put them here
 # 5 - Redeploy code, verify that the  encoder readings are correct as each module is manually rotated
-FL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 110)
-FR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 40 - 14)
-BL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 45 - 10 - 4)
-BR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 + 70 + 5)
+FL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 + 85 + 180)
+FR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 123 + 180)  #55
+BL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 + 127 + 180 + 180)
+BR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 151 + 180 + 180)
 
 # Perhaps we invert the swerve module azimuth motor
 INVERT_AZMTH_MOTOR = False

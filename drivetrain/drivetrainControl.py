@@ -23,7 +23,6 @@ from drivetrain.drivetrainPhysical import BL_INVERT_WHEEL_MOTOR
 from drivetrain.drivetrainPhysical import BR_INVERT_WHEEL_MOTOR
 from drivetrain.drivetrainPhysical import kinematics
 
-from AutoSequencerV2.teleopConditions import TeleConditions
 
 class DrivetrainControl(metaclass=Singleton):
     """
@@ -53,28 +52,7 @@ class DrivetrainControl(metaclass=Singleton):
 
         self.trajCtrl = DrivetrainTrajectoryControl()
 
-        self.teleConditions = TeleConditions()
-
         self._updateAllCals()
-
-    def setModuleState(self, moduleName, speed, angle):
-        """
-        Set the speed and angle for a specific swerve module.
-
-        Args:
-            moduleName (str): The name of the module ('FL', 'FR', 'BL', 'BR').
-            speed (float): The speed in meters per second.
-            angle (float): The angle in degrees.
-        """
-        # Find the module by name
-        for module in self.modules:
-            if module.moduleName == moduleName:
-                # Create a new SwerveModuleState and apply it to the module
-                module_state = SwerveModuleState(speed, Rotation2d.fromDegrees(angle)) # pylint: disable=invalid-name
-                module.setDesiredState(module_state)
-                module.update()
-                return
-        print(f"Module {moduleName} not found")
 
     def setCmdFieldRelative(self, velX, velY, velT):
         """Send commands to the robot for motion relative to the field
@@ -116,8 +94,6 @@ class DrivetrainControl(metaclass=Singleton):
         Main periodic update, should be called every 20ms
         """
 
-        if self.teleConditions.veloTest:
-            return
 
         # Given the current desired chassis speeds, convert to module states
         desModStates = kinematics.toSwerveModuleStates(self.desChSpd)
