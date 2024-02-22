@@ -22,7 +22,6 @@ from AutoSequencerV2.autoSequencer import AutoSequencer
 from debugMaster.debug import Debug
 from noteMaster.noteHandler import NoteHandler
 
-
 class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Common init/update for all modes
@@ -61,12 +60,6 @@ class MyRobot(wpilib.TimedRobot):
         # self.autoSequencer.addMode(DrivePathCircle())
 
         self.dashboard = dashboardOrNone()
-        self.dbg = Debug()
-        self.dbg.toPrint.update({'velState':False})
-        self.dbg.toPrint.update({'sparkUpdates':False})
-        self.dbg.toPrint.update({'hi':False})
-        self.dbg.toPrint.update({'test':True})
-        self.dbg.toPrint.update({'note':True})
 
         # self.caliVelX = 0.0
         # self.caliVelY = 0.0
@@ -91,6 +84,14 @@ class MyRobot(wpilib.TimedRobot):
         self.noteHandler = NoteHandler()
         #self.teleConditions = TeleConditions()
         #self.pieceCtrl = GamePieceCtrl()
+
+        self.dbg = Debug()
+        self.dbg.toPrint.update({'velState': False})
+        self.dbg.toPrint.update({'sparkUpdates': False})
+        self.dbg.toPrint.update({'hi': False})
+        self.dbg.toPrint.update({'test': False})
+        self.dbg.toPrint.update({'note': True})
+        self.dbg.toPrint.update({'error': True})
 
         # Uncomment this and simulate to update the code
         # dependencies graph

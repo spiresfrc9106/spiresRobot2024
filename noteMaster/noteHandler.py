@@ -4,16 +4,18 @@ from utils.singleton import Singleton
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from debugMaster.debug import Debug
 
+
 class Constants:
 
     USE_AFF = True
+    SPEED_FACTOR = 1
 
     # Speed Control #
-    INTAKE_VEL_RPS = 3.75
-    TRANSFER_FORWARD_VEL_RPS = 3.75
-    TRANSFER_REVERSE_VEL_RPS = -1 * 0.75
-    SHOOTER_VEL_RPS = 50
-    TRANSFER_NUDGING_VEL_RPS = 1
+    INTAKE_VEL_RPS = 3.75 * SPEED_FACTOR
+    TRANSFER_FORWARD_VEL_RPS = 3.75 * SPEED_FACTOR
+    TRANSFER_REVERSE_VEL_RPS = -1 * 0.75 * SPEED_FACTOR
+    SHOOTER_VEL_RPS = 50 * SPEED_FACTOR
+    TRANSFER_NUDGING_VEL_RPS = 1 * SPEED_FACTOR
 
     # Electrical #
     INTAKE1_SPARK_MAX_ID = 11
@@ -93,7 +95,7 @@ class Shooter(metaclass=Singleton):
 
 class Optical(metaclass=Singleton):
     def __init__(self):
-        self.sensor1 = DigitalInput(5)
+        self.sensor1 = DigitalInput(4)  #5
         self.sensor2 = DigitalInput(6)
 
 
@@ -151,12 +153,15 @@ class NoteHandler(metaclass=Singleton):
         self.currentState = NoteState.DefaultEmpty
 
         self.intakeCmd = False
+        self.aimingCmd = False
+        self.propelCmd = False
 
 
     def switch(self, state):
         self.currentState = state
 
     def update(self):
+        self.debug.print("note", self.optical.sensor1.get())
         if self.currentState != self.prevState:
             self.debug.print("note", f"switching from {self.prevState} to {self.currentState}")
             self.prevState = self.currentState
@@ -170,10 +175,10 @@ class NoteHandler(metaclass=Singleton):
             case NoteState.ApproachingNote:
                 self.intake.setVelRPS(Constants.INTAKE_VEL_RPS)
                 self.transfer.setVelRPS(Constants.TRANSFER_FORWARD_VEL_RPS)
-                if self.optical.sensor1.get():
+                if not self.optical.sensor1.get():
                     self.switch(NoteState.DockingTransfer)
             case NoteState.DockingTransfer:
-                if self.optical.sensor2.get():
+                if not self.optical.sensor2.get():
                     self.switch(NoteState.ExitingTransfer)
             case NoteState.ExitingTransfer:
                 self.switch(NoteState.StoppingForward)
@@ -188,17 +193,21 @@ class NoteHandler(metaclass=Singleton):
             case NoteState.StoppingReverse:
                 self.transfer.setVelRPS(0)
             case NoteState.ShooterPrepared:
-                pass
+                if self.aimingCmd:
+                    self.switch(NoteState.AimingActivated)
             case NoteState.AimingActivated:
                 self.shooter.setVelRPS(Constants.SHOOTER_VEL_RPS)
+                if self.propelCmd:
+                    self.switch(NoteState.TransferNudging)
             case NoteState.TransferNudging:
                 self.transfer.setVelRPS(Constants.TRANSFER_NUDGING_VEL_RPS)
+                # @yavin need some sort of auto-driven functionality to wait until shooting success
             case NoteState.PropelSucceeded:
                 self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(0)
                 self.shooter.setVelRPS(0)
             case _:
-                self.debug.print("note", "error with state machine; no value found")
+                self.debug.print("error", "error with state machine; no value found")
                 self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(0)
                 self.shooter.setVelRPS(0)
