@@ -54,7 +54,7 @@ class DriverInterface:
 
             # Normally robot goes half speed - unlock full speed on
             # sprint command being active
-            sprintMult = 1.0 if (self.ctrl.getLeftBumper()) else 0.5
+            sprintMult = 0.5 if (self.ctrl.getLeftBumper()) else 1.0
 
             # Convert joystick fractions into physical units of velocity
             velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * sprintMult
