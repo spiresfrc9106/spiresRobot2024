@@ -18,7 +18,6 @@ class DriverInterface:
         ctrlIdx = 0
         self.ctrl = XboxController(ctrlIdx)
 
-
         aimerIdx = 0
         self.aimer = XboxController(aimerIdx)
 
@@ -55,12 +54,12 @@ class DriverInterface:
 
             # Normally robot goes half speed - unlock full speed on
             # sprint command being active
-            sprintMult = 1.0 if (self.ctrl.getRightBumper()) else 0.5
+            sprintMult = 1.0 if (self.ctrl.getLeftBumper()) else 0.5
 
             # Convert joystick fractions into physical units of velocity
             velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * sprintMult
             velYCmdRaw = vYJoy * MAX_STRAFE_SPEED_MPS * sprintMult
-            velTCmdRaw = vTJoy * MAX_ROTATE_SPEED_RAD_PER_SEC
+            velTCmdRaw = vTJoy * MAX_ROTATE_SPEED_RAD_PER_SEC * sprintMult
 
             # Slew-rate limit the velocity units to not change faster than
             # the robot can physically accomplish
