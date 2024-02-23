@@ -17,6 +17,11 @@ class DriverInterface:
     def __init__(self):
         ctrlIdx = 0
         self.ctrl = XboxController(ctrlIdx)
+
+
+        aimerIdx = 0
+        self.aimer = XboxController(aimerIdx)
+
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0

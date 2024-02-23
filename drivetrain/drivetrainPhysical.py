@@ -10,7 +10,8 @@ from utils.units import lbsToKg
 from utils.units import deg2Rad
 from utils.units import in2m
 from wrappers.wrapperedRevThroughBoreEncoder import WrapperedRevThroughBoreEncoder
-from robotDependentConstants import RobotDependentConstants
+from drivetrain.robotDependentConstants import RobotDependentConstants
+from config import ROBOT_BUILD
 
 # pylint: disable=R0801
 
@@ -20,8 +21,7 @@ Defines the physical dimensions and characteristics of the drivetrain
 
 ###################################################################
 
-Robot = 2024
-constants = RobotDependentConstants().get()[Robot]
+constants = RobotDependentConstants().get()[ROBOT_BUILD]
 
 ###################################################################
 # Physical dimensions and mass distribution

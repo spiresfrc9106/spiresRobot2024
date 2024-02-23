@@ -139,7 +139,6 @@ class MyRobot(wpilib.TimedRobot):
     #########################################################
     ## Autonomous-Specific init and update
     def autonomousInit(self):
-
         # Start up the autonomous sequencer
         self.autoSequencer.initiaize()
 
@@ -160,7 +159,7 @@ class MyRobot(wpilib.TimedRobot):
         pass
 
     def teleopPeriodic(self):
-	self.dInt.update()
+        self.dInt.update()
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", self.dInt.getVxCmd())
         self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
@@ -172,6 +171,7 @@ class MyRobot(wpilib.TimedRobot):
 
     #########################################################
     ## Disabled-Specific init and update
+
     def disabledPeriodic(self):
         self.autoSequencer.updateMode()
         self.driveTrain.trajCtrl.updateCals()
@@ -182,13 +182,13 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.print("robot", "test mode initiated")
 
     def testPeriodic(self):
-	pass
+        pass
 
     def testExit(self):
         pass
 
     #########################################################
-    ## Cleanup
+    # Cleanup
     def endCompetition(self):
         if hasattr(self, 'rioMonitor') and self.rioMonitor is not None:
             self.rioMonitor.stopThreads()
