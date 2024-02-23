@@ -81,8 +81,8 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.toPrint.update({'sparkUpdates': False})
         self.dbg.toPrint.update({'hi': False})
         self.dbg.toPrint.update({'test': False})
-        self.dbg.toPrint.update({'note': True})
-        self.dbg.toPrint.update({'error': True})
+        self.dbg.toPrint.update({'note': False})  # True
+        self.dbg.toPrint.update({'error': False})  # True
 
         # Uncomment this and simulate to update the code
         # dependencies graph
