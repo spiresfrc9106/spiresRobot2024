@@ -12,11 +12,12 @@ from dashboardWidgets.swerveState import getAzmthDesTopicName, getAzmthActTopicN
 from dashboardWidgets.swerveState import getSpeedDesTopicName, getSpeedActTopicName
 from utils.signalLogging import log
 from utils.units import rad2Deg
+from utils.faults import Fault
 from utils.segmentTimeTracker import SegmentTimeTracker
+from utils.robotIdentification import RobotIdentification
 from drivetrain.drivetrainPhysical import dtMotorRotToLinear
 from drivetrain.drivetrainPhysical import dtLinearToMotorRot
 from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS
-from drivetrain.drivetrainPhysical import INVERT_AZMTH_MOTOR
 from drivetrain.drivetrainPhysical import wrapperedSwerveDriveAzmthEncoder
 
 class SwerveModuleControl:
@@ -32,6 +33,8 @@ class SwerveModuleControl:
         azmthEncoderPortIdx,
         azmthOffset,
         invertWheel,
+        invertAzmthMotor,
+        invertAzmthEncoder
     ):
         """Instantiate one swerve drive module
 
@@ -42,6 +45,7 @@ class SwerveModuleControl:
             azmthEncoderPortIdx (int): RIO Port for the azimuth absolute encoder for this module
             azmthOffset (float): Mounting offset of the azimuth encoder in Radians.
             invertWheel (bool): Inverts the drive direction of the wheel - needed since left/right sides are mirrored
+            invertWheel (bool): Inverts the steering direction of the wheel - needed if motor is mounted upside
         """
         self.wheelMotor = WrapperedSparkMax(
             wheelMotorCanID, moduleName + "_wheel", False
@@ -51,13 +55,13 @@ class SwerveModuleControl:
         )
 
         self.azmthEnc = wrapperedSwerveDriveAzmthEncoder(
-            azmthEncoderPortIdx, moduleName + "_azmthEnc", azmthOffset
+            azmthEncoderPortIdx, moduleName + "_azmthEnc", azmthOffset, invertAzmthEncoder
         )
 
         self.wheelMotor.setInverted(invertWheel)
-        self.azmthMotor.setInverted(INVERT_AZMTH_MOTOR)
-        
-        self.wheelMotorFF = SimpleMotorFeedforwardMeters(0,0,0)
+        self.azmthMotor.setInverted(invertAzmthMotor)
+
+        self.wheelMotorFF = SimpleMotorFeedforwardMeters(0, 0, 0)
 
         self.desiredState = SwerveModuleState()
         self.optimizedDesiredState = SwerveModuleState()
@@ -70,6 +74,9 @@ class SwerveModuleControl:
         self._prevMotorDesSpeed = 0
 
         self.moduleName = moduleName
+
+        self.serialFault = Fault(f"Serial Number Unknown")
+        self.rId = RobotIdentification()
         self.stt = SegmentTimeTracker()
         #                                                                         1         2         3
         #                                                                12345678901234567890123456789012345
@@ -104,6 +111,11 @@ class SwerveModuleControl:
             (self.actualState.speed) / MAX_FWD_REV_SPEED_MPS,
             "frac",
         )
+
+        if self.rId.getSerialFaulted():
+            self.serialFault.setFaulted()
+        else:
+            self.serialFault.setNoFault()
 
     def getActualPosition(self):
         """
@@ -182,10 +194,13 @@ class SwerveModuleControl:
 
         if wpilib.TimedRobot.isSimulation():
             # Simulation - assume module is almost perfect but with some noise
-            self.actualState.angle = self.optimizedDesiredState.angle + \
-                Rotation2d.fromDegrees(random.uniform(-2,2))
-            self.actualState.speed = self.optimizedDesiredState.speed + \
-                random.uniform(-0.1, 0.1)
+            self.actualState.angle = (
+                self.optimizedDesiredState.angle
+                + Rotation2d.fromDegrees(random.uniform(-1, 1))
+            )
+            self.actualState.speed = self.optimizedDesiredState.speed + random.uniform(
+                -0.1, 0.1
+            )
             self.actualPosition.distance += self.actualState.speed * 0.02
             self.actualPosition.angle = self.actualState.angle
         else:

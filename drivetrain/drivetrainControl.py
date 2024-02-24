@@ -9,10 +9,8 @@ from drivetrain.poseEstimation.drivetrainPoseEstimator import DrivetrainPoseEsti
 from drivetrain.swerveModuleControl import SwerveModuleControl
 from drivetrain.swerveModuleGainSet import SwerveModuleGainSet
 from drivetrain.drivetrainTrajectoryControl import DrivetrainTrajectoryControl
-from drivetrain.drivetrainPhysical import (
-    FL_ENCODER_MOUNT_OFFSET_RAD,
-    MAX_FWD_REV_SPEED_MPS,
-)
+from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS
+from drivetrain.drivetrainPhysical import FL_ENCODER_MOUNT_OFFSET_RAD
 from drivetrain.drivetrainPhysical import FR_ENCODER_MOUNT_OFFSET_RAD
 from drivetrain.drivetrainPhysical import BL_ENCODER_MOUNT_OFFSET_RAD
 from drivetrain.drivetrainPhysical import BR_ENCODER_MOUNT_OFFSET_RAD
@@ -20,6 +18,8 @@ from drivetrain.drivetrainPhysical import FL_INVERT_WHEEL_MOTOR
 from drivetrain.drivetrainPhysical import FR_INVERT_WHEEL_MOTOR
 from drivetrain.drivetrainPhysical import BL_INVERT_WHEEL_MOTOR
 from drivetrain.drivetrainPhysical import BR_INVERT_WHEEL_MOTOR
+from drivetrain.drivetrainPhysical import INVERT_AZMTH_MOTOR
+from drivetrain.drivetrainPhysical import INVERT_AZMTH_ENCODER
 from drivetrain.drivetrainPhysical import kinematics
 
 
@@ -37,11 +37,14 @@ class DrivetrainControl(metaclass=Singleton):
         self.markPoseEstUpdateName         = self.stt.makePaddedMarkName("poseEst.update")
         self.markGainsHasChangedName       = self.stt.makePaddedMarkName("gains.hasChanged")
         self.modules = []
-        self.modules.append(SwerveModuleControl("FL", 2, 3, 0, FL_ENCODER_MOUNT_OFFSET_RAD, FL_INVERT_WHEEL_MOTOR))
-        self.modules.append(SwerveModuleControl("FR", 4, 5, 1, FR_ENCODER_MOUNT_OFFSET_RAD, FR_INVERT_WHEEL_MOTOR))
-        self.modules.append(SwerveModuleControl("BL", 6, 7, 2, BL_ENCODER_MOUNT_OFFSET_RAD, BL_INVERT_WHEEL_MOTOR))
-        self.modules.append(SwerveModuleControl("BR", 8, 9, 3, BR_ENCODER_MOUNT_OFFSET_RAD, BR_INVERT_WHEEL_MOTOR))
-
+        self.modules.append(SwerveModuleControl("FL", 2, 3, 0,
+            FL_ENCODER_MOUNT_OFFSET_RAD, FL_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
+        self.modules.append(SwerveModuleControl("FR", 4, 5, 1,
+            FR_ENCODER_MOUNT_OFFSET_RAD, FR_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
+        self.modules.append(SwerveModuleControl("BL", 6, 7, 2,
+            BL_ENCODER_MOUNT_OFFSET_RAD, BL_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
+        self.modules.append(SwerveModuleControl("BR", 8, 9, 3,
+            BR_ENCODER_MOUNT_OFFSET_RAD, BR_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
         self.desChSpd = ChassisSpeeds()
         self.curDesPose = Pose2d()
 

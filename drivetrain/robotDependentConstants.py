@@ -4,10 +4,10 @@ class RobotDependentConstants:
             '2023': {
                 "WIDTH": 16.5,
                 "LENGTH": 26.5,
-                "FL_OFFSET": -110,
-                "FR_OFFSET": -54,
-                "BL_OFFSET": -59,
-                "BR_OFFSET": 75,
+                "FL_OFFSET": (-110+180),# TODO RMS trying backing out the INVERT_WHEEL_MOTOR and adding it to FL_OFFSET
+                "FR_OFFSET": (-54),
+                "BL_OFFSET": (-59+180), # TODO RMS trying backing out the INVERT_WHEEL_MOTOR and adding it to BL_OFFSET
+                "BR_OFFSET": (75),
             },
             '2023sim': {
                 "WIDTH": 16.5,

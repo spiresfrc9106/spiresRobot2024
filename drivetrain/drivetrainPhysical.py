@@ -116,11 +116,12 @@ BR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(constants["BR_OFFSET"])
 
 # Perhaps we invert the swerve module azimuth motor
 INVERT_AZMTH_MOTOR = False
+INVERT_AZMTH_ENCODER = True
 
 # Perhaps we invert the swerve module wheel motor drive direction
-FL_INVERT_WHEEL_MOTOR = True
+FL_INVERT_WHEEL_MOTOR = False
 FR_INVERT_WHEEL_MOTOR = False
-BL_INVERT_WHEEL_MOTOR = True
+BL_INVERT_WHEEL_MOTOR = False
 BR_INVERT_WHEEL_MOTOR = False
 
 # Module Indices (for ease of array manipulation)
@@ -130,12 +131,12 @@ BL = 2
 BR = 3
 
 # Function make a swerve module azimuth encoder reader object
-def wrapperedSwerveDriveAzmthEncoder(azmthEncoderPortIdx, moduleName, azmthOffsetRad):
+def wrapperedSwerveDriveAzmthEncoder(azmthEncoderPortIdx, moduleName, azmthOffsetRad, inverted):
     return WrapperedRevThroughBoreEncoder(
         port=azmthEncoderPortIdx,
         name=moduleName,
         mountOffsetRad=azmthOffsetRad,
-        dirInverted=True
+        dirInverted=inverted
     )
 
 class NoGyro():
