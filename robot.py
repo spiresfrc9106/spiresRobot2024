@@ -162,14 +162,15 @@ class MyRobot(wpilib.TimedRobot):
         self.dInt.update()
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
+
         if self.dInt.fieldRelative:
             self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
-        if True: #self.dInt.getIntakeActive():
-            self.noteHandler.intakeCmd = True
-        else:
-            self.noteHandler.intakeCmd = False
+
+        self.noteHandler.intakeCmd = self.dInt.getIntakeActive()
+        self.noteHandler.aimingCmd = self.dInt.getAimingActive()
+        self.noteHandler.propelCmd = self.dInt.getPropelActive()
 
 
     #########################################################

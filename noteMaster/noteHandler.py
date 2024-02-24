@@ -152,9 +152,9 @@ class NoteHandler(metaclass=Singleton):
         self.prevState = NoteState.DefaultEmpty
         self.currentState = NoteState.DefaultEmpty
 
-        self.intakeCmd = False
-        self.aimingCmd = False
-        self.propelCmd = False
+        self.intakeCmd = False # Start intake roller
+        self.aimingCmd = False # Accelerate shooter up to speed
+        self.propelCmd = False # Nudge note from transfer to shooter
 
 
     def switch(self, state):
@@ -185,8 +185,7 @@ class NoteHandler(metaclass=Singleton):
             case NoteState.StoppingForward:
                 self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(0)
-                speed = 0.5 * (self.transfer.motor1.getVelRPS() + self.transfer.motor1.getVelRPS())
-                if speed < 1.0:
+                if self.transfer.motor1.getVelRPS() < 1.0:
                     self.switch(NoteState.ReversingAction)
             case NoteState.ReversingAction:
                 self.transfer.setVelRPS(Constants.TRANSFER_REVERSE_VEL_RPS)
