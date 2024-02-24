@@ -1,12 +1,12 @@
 import math
 
 import wpilib
-
 from wpimath.units import metersToFeet
 from wpimath.trajectory import Trajectory
 from wpimath.geometry import Pose2d
 from utils.signalLogging import log
 from utils.allianceTransformUtils import transform
+from wrappers.wrapperedPhotonCamera import CameraPoseObservation
 
 
 class DrivetrainPoseTelemetry:
@@ -21,8 +21,18 @@ class DrivetrainPoseTelemetry:
         self.curTraj = Trajectory()
         self.desPose = Pose2d()
 
+        self.visionPoses = []
+
     def setDesiredPose(self, desPose):
         self.desPose = desPose
+
+    def addVisionObservations(self, observations:list[CameraPoseObservation]):
+        if(len(observations) > 0):
+            for obs in observations:
+                self.visionPoses.append(obs.estFieldPose())
+
+    def clearVisionObservations(self):
+        self.visionPoses = []
 
     def update(self, estPose):
         self.field.getRobotObject().setPose(estPose)
@@ -50,7 +60,9 @@ class DrivetrainPoseTelemetry:
             # make sure we only send a sampled subset of the positions
             sampTime = 0
             while sampTime < trajIn.getTotalTime():
-                stateList.append(self._choreoToWPIState(transform(trajIn.sample(sampTime))))
+                stateList.append(
+                    self._choreoToWPIState(transform(trajIn.sample(sampTime)))
+                )
                 sampTime += 0.5
 
             # Make sure final pose is in the list
