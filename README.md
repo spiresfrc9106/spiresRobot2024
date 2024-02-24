@@ -121,9 +121,15 @@ Github runs our code on its servers on every commit to ensure our code stays hig
 
 To minimize frustration and rework, before committing, be sure to:
 
-1. Run the test suite
-2. Run `lint.bat` and fix any formatting errors
 
+1. Run lint and fix any formatting errors
+```cmd
+pylint --rcfile=.pylintrc $(git ls-files '*.py')
+```
+2. Run the test suite
+```cmd
+python -m robotpy test
+```
 ## RIO First-time Installation
 
 Follow [the robotpy instructions for setting up the RIO](https://robotpy.readthedocs.io/en/stable/install/robot.html)
