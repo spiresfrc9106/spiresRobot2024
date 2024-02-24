@@ -161,8 +161,11 @@ class MyRobot(wpilib.TimedRobot):
     def teleopPeriodic(self):
         self.dInt.update()
         self.dbg.print("robot", "running game mode")
-        self.dbg.print("hi", self.dInt.getVxCmd())
-        self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
+        self.dbg.print("hi", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
+        if self.dInt.fieldRelative:
+            self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
+        else:
+            self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
         if True: #self.dInt.getIntakeActive():
             self.noteHandler.intakeCmd = True
         else:

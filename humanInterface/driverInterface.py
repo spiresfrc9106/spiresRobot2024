@@ -10,6 +10,7 @@ from drivetrain.drivetrainPhysical import MAX_TRANSLATE_ACCEL_MPS2
 from utils.faults import Fault
 from utils.signalLogging import log
 from utils.allianceTransformUtils import onRed
+from utils.units import rad2Deg
 
 class DriverInterface:
     """Class to gather input from the driver of the robot"""
@@ -21,6 +22,7 @@ class DriverInterface:
         aimerIdx = 0
         self.aimer = XboxController(aimerIdx)
 
+        self.fieldRelative = True
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
@@ -41,6 +43,9 @@ class DriverInterface:
 
         if self.ctrl.isConnected():
             # Only attempt to read from the joystick if it's plugged in
+
+            # Driver can select field relative or robot relative steering
+            self.fieldRelative = not self.ctrl.getRightBumper()
 
             # Convert from joystic sign/axis conventions to robot velocity conventions
             vXJoyRaw = -1.0 * self.ctrl.getLeftY()
@@ -68,7 +73,7 @@ class DriverInterface:
             self.velTCmd = self.velTSlewRateLimiter.calculate(velTCmdRaw)
 
             # Adjust the commands if we're on the opposite side of the feild
-            if onRed():
+            if onRed() and self.fieldRelative:
                 self.velXCmd *= -1
                 self.velYCmd *= -1
 
@@ -78,6 +83,7 @@ class DriverInterface:
             self.connectedFault.setNoFault()
         else:
             # If the joystick is unplugged, pick safe-state commands and raise a fault
+            self.fieldRelative = True
             self.velXCmd = 0.0
             self.velYCmd = 0.0
             self.velTCmd = 0.0
@@ -89,9 +95,10 @@ class DriverInterface:
         else:
             self.initIntake = False
 
+        log("DI fieldR Cmd", self.fieldRelative, "bool")
         log("DI FwdRev Cmd", self.velXCmd, "mps")
         log("DI Strafe Cmd", self.velYCmd, "mps")
-        log("DI Rotate Cmd", self.velTCmd, "radPerSec")
+        log("DI Rotate Cmd", rad2Deg(self.velTCmd), "degPerSec")
         log("DI connected", self.ctrl.isConnected(), "bool")
 
     def getVxCmd(self):
