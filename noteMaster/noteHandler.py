@@ -45,7 +45,8 @@ class Constants:
 
 class Intake(metaclass=Singleton):
     def __init__(self):
-        self.motor1 = WrapperedSparkMax(canID=Constants.INTAKE1_SPARK_MAX_ID, name="Intake1")
+        self.motor1 = WrapperedSparkMax(canID=Constants.INTAKE1_SPARK_MAX_ID, 
+                                        name="Intake1", brakeMode=True, curLimitA=6)
         self.motor1.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
 
     def setVelRPS(self, rps, aff=0.0):
@@ -58,8 +59,10 @@ class Intake(metaclass=Singleton):
 
 class Transfer(metaclass=Singleton):
     def __init__(self):
-        self.motor1 = WrapperedSparkMax(canID=Constants.TRANSFER1_SPARK_MAX_ID, name="Transfer1")
-        self.motor2 = WrapperedSparkMax(canID=Constants.TRANSFER2_SPARK_MAX_ID, name="Transfer2")
+        self.motor1 = WrapperedSparkMax(canID=Constants.TRANSFER1_SPARK_MAX_ID,
+                                        name="Transfer1", brakeMode=True, curLimitA=6)
+        self.motor2 = WrapperedSparkMax(canID=Constants.TRANSFER2_SPARK_MAX_ID,
+                                        name="Transfer2", brakeMode=True, curLimitA=6)
         self.motor1.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
         self.motor2.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
 
