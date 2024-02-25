@@ -2,6 +2,7 @@ import sys
 import gc
 import wpilib
 from Autonomous.modes.driveOut import DriveOut
+from humanInterface.operatorInterface import OperatorInterface
 from robotConfig import webserverConstructorOrNone
 from robotConfig import dashboardOrNone
 from humanInterface.driverInterface import DriverInterface
@@ -49,6 +50,7 @@ class MyRobot(wpilib.TimedRobot):
         self.driveTrain = DrivetrainControl()
 
         self.dInt = DriverInterface()
+        self.opInt = OperatorInterface()
 
         self.ledCtrl = LEDControl()
 
@@ -160,6 +162,8 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.dInt.update()
+        self.opInt.update()
+
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
 
@@ -168,9 +172,9 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
-        self.noteHandler.intakeStartCmd = self.dInt.getStartIntakeCmd()
-        self.noteHandler.shootCmd = self.dInt.getStartShooterCmd()
-        self.noteHandler.cancelHandlingCmd = self.dInt.getCancelNoteHandlingCmd()
+        self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()
+        self.noteHandler.shootCmd = self.opInt.getStartShooterCmd()
+        self.noteHandler.cancelHandlingCmd = self.opInt.getCancelNoteHandlingCmd()
 
 
     #########################################################

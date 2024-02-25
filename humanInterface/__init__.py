@@ -1,1 +1,2 @@
-# No one here but us chickens
+DRIVER_CTRL_IDX = 0
+OPERATOR_CTRL_IDX = 1

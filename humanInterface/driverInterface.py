@@ -1,5 +1,4 @@
 from wpilib import XboxController
-# from wpilib import Joystick
 from wpimath import applyDeadband
 from wpimath.filter import SlewRateLimiter
 from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS
@@ -11,27 +10,20 @@ from utils.faults import Fault
 from utils.signalLogging import log
 from utils.allianceTransformUtils import onRed
 from utils.units import rad2Deg
+from . import DRIVER_CTRL_IDX
 
 class DriverInterface:
     """Class to gather input from the driver of the robot"""
 
     def __init__(self):
-        ctrlIdx = 0
-        self.ctrl = XboxController(ctrlIdx)
-
-        aimerIdx = 0
-        self.aimer = XboxController(aimerIdx)
+        self.ctrl = XboxController(DRIVER_CTRL_IDX)
 
         self.fieldRelative = True
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
         self.gyroResetCmd = False
-        self.connectedFault = Fault(f"Driver XBox Controller ({ctrlIdx}) Unplugged")
-
-        self.startIntake = False
-        self.startShooter = False
-        self.cancelNoteHandling = False
+        self.connectedFault = Fault(f"Driver XBox Controller ({DRIVER_CTRL_IDX}) Unplugged")
 
         self.velXSlewRateLimiter = SlewRateLimiter(rateLimit=MAX_TRANSLATE_ACCEL_MPS2)
         self.velYSlewRateLimiter = SlewRateLimiter(rateLimit=MAX_TRANSLATE_ACCEL_MPS2)
@@ -80,7 +72,6 @@ class DriverInterface:
                 self.velXCmd *= -1
                 self.velYCmd *= -1
 
-            
             self.gyroResetCmd = self.ctrl.getAButtonPressed()
 
             self.connectedFault.setNoFault()
@@ -92,15 +83,6 @@ class DriverInterface:
             self.velTCmd = 0.0
             self.gyroResetCmd = False
             self.connectedFault.setFaulted()
-
-        if self.aimer.isConnected():
-            self.startIntake = self.aimer.getYButtonPressed()
-            self.startShooter = self.aimer.getAButtonPressed()
-            self.cancelNoteHandling = self.aimer.getBButtonPressed()
-        else:
-            self.startIntake = False
-            self.startShooter = False
-            self.cancelNoteHandling = False
 
         log("DI fieldR Cmd", self.fieldRelative, "bool")
         log("DI FwdRev Cmd", self.velXCmd, "mps")
@@ -128,13 +110,6 @@ class DriverInterface:
             float: Driver's current vT (rotation) command in radians per second
         """
         return self.velTCmd
-
-    def getStartIntakeCmd(self):
-        return self.startIntake
-    def getStartShooterCmd(self):
-        return self.startShooter
-    def getCancelNoteHandlingCmd(self):
-        return self.cancelNoteHandling
 
     def getGyroResetCmd(self):
         """_summary_
