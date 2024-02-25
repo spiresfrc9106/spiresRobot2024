@@ -22,15 +22,15 @@ class RobotDependentConstants:
             '2024': {
                 "WIDTH": 22.5,
                 "LENGTH": 26.5,
-                "FL_OFFSET": 265,
+                "FL_OFFSET": (265-180), # todo unverified guess at adjustment changing to INVERT_WHEEL_MOTOR=False
                 "FR_OFFSET": 57,
-                "BL_OFFSET": 487,
+                "BL_OFFSET": (487-180), # todo unverified guess at adjustment changing to INVERT_WHEEL_MOTOR=False
                 "BR_OFFSET": 209,
                 "GYRO": "NAVX",
             },
             '2024sim': {
                 "WIDTH": 22.5,
-                "LENGTH": 3*26.5,
+                "LENGTH": 26.5,
                 "FL_OFFSET": 0,
                 "FR_OFFSET": 0,
                 "BL_OFFSET": 0,
