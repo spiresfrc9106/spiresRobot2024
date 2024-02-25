@@ -13,7 +13,7 @@ from utils.faults import Fault
 # Fault annunciation logic to trigger warnings if a motor couldn't be configured
 
 class WrapperedSparkMax:
-    def __init__(self, canID, name, brakeMode=False):
+    def __init__(self, canID, name, brakeMode=False, curLimitA=40):
         self.ctrl = CANSparkMax(canID, CANSparkLowLevel.MotorType.kBrushless)
         self.pidCtrl = self.ctrl.getPIDController()
         self.encoder = self.ctrl.getEncoder()
@@ -33,7 +33,7 @@ class WrapperedSparkMax:
                 else CANSparkMax.IdleMode.kCoast
             )
             errList.append(self.ctrl.setIdleMode(mode))
-            errList.append(self.ctrl.setSmartCurrentLimit(40))
+            errList.append(self.ctrl.setSmartCurrentLimit(curLimitA))
             # Status 0 = Motor output and Faults
             errList.append(
                 self.ctrl.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, 20)

@@ -5,6 +5,7 @@ from Autonomous.modes.driveOut import DriveOut
 from robotConfig import webserverConstructorOrNone
 from robotConfig import dashboardOrNone
 from humanInterface.driverInterface import DriverInterface
+from humanInterface.operatorInterface import OperatorInterface
 from humanInterface.ledControl import LEDControl
 from drivetrain.drivetrainControl import DrivetrainControl
 # from drivetrain.drivetrainTrajectoryControl import DrivetrainTrajectoryControl
@@ -49,6 +50,7 @@ class MyRobot(wpilib.TimedRobot):
         self.driveTrain = DrivetrainControl()
 
         self.dInt = DriverInterface()
+        self.oInt = OperatorInterface()
 
         self.ledCtrl = LEDControl()
 
@@ -66,14 +68,6 @@ class MyRobot(wpilib.TimedRobot):
             enableDiskUpdates=False
         )
 
-        print(f"before:0:{len(gc.get_objects(generation=0))}")
-        print(f"before:1:{len(gc.get_objects(generation=1))}")
-        print(f"before:2:{len(gc.get_objects(generation=2))}")
-        gc.freeze()
-        print(f"after:0:{len(gc.get_objects(generation=0))}")
-        print(f"after:1:{len(gc.get_objects(generation=1))}")
-        print(f"after:2:{len(gc.get_objects(generation=2))}")
-
         self.noteHandler = NoteHandler()
 
         self.dbg = Debug()
@@ -81,8 +75,16 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.toPrint.update({'sparkUpdates': False})
         self.dbg.toPrint.update({'hi': False})
         self.dbg.toPrint.update({'test': False})
-        self.dbg.toPrint.update({'note': False})  # True
-        self.dbg.toPrint.update({'error': False})  # True
+        self.dbg.toPrint.update({'note': True})
+        self.dbg.toPrint.update({'error': False})
+
+        # print(f"before:0:{len(gc.get_objects(generation=0))}")
+        # print(f"before:1:{len(gc.get_objects(generation=1))}")
+        # print(f"before:2:{len(gc.get_objects(generation=2))}")
+        gc.freeze()
+        # print(f"after:0:{len(gc.get_objects(generation=0))}")
+        # print(f"after:1:{len(gc.get_objects(generation=1))}")
+        # print(f"after:2:{len(gc.get_objects(generation=2))}")
 
         # Uncomment this and simulate to update the code
         # dependencies graph
@@ -91,7 +93,7 @@ class MyRobot(wpilib.TimedRobot):
 
 
     def robotPeriodic(self):
-        gc.disable()
+        #gc.disable()
         self.stt.start()
 
         self.stt.perhapsMark(self.markStartCrashName)
@@ -119,14 +121,14 @@ class MyRobot(wpilib.TimedRobot):
             self.rioMonitor.updateFromPerioidLoop()
         self.stt.mark("rioMonitor.updateFromPerioidLoop()_")
         # print(f"before:{gc.get_stats()}")
-        gc.enable()
+        #gc.enable()
         # gc.collect(generation=0)
         # self.stt.mark("gc.collect(0)______________________")
         # gc.collect(generation=1)
         # self.stt.mark("gc.collect(1)______________________")
         # gc.collect()
-        self.stt.mark("gc.collect()_______________________")
-        gc.disable()
+        #self.stt.mark("gc.collect()_______________________")
+        #gc.disable()
         # print(f"after:{gc.get_stats()}")
         # print(
         #    f"after:0:{len(gc.get_objects(generation=0)):5} "
@@ -160,16 +162,21 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.dInt.update()
+        self.oInt.update()
         self.dbg.print("robot", "running game mode")
-        self.dbg.print("hi", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
+        self.dbg.print("hi:di:", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
         if self.dInt.fieldRelative:
             self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
-        if True: #self.dInt.getIntakeActive():
-            self.noteHandler.intakeCmd = True
+        if True: # pylint: disable=using-constant-test
+            self.noteHandler.setVelocityFactors(
+                intakeVelFactor=self.oInt.intakeVelocityFactor,
+                shootVelFactor=self.oInt.shooterVelocityFactor)
         else:
-            self.noteHandler.intakeCmd = False
+            self.noteHandler.setVelocityFactors(
+                intakeVelFactor=0.0,
+                shootVelFactor=0.0)
 
 
     #########################################################

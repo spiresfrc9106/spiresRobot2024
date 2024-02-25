@@ -11,11 +11,14 @@ from utils.faults import Fault
 from utils.signalLogging import log
 from utils.allianceTransformUtils import onRed
 from utils.units import rad2Deg
+from debugMaster.debug import Debug
 
 class DriverInterface:
     """Class to gather input from the driver of the robot"""
 
     def __init__(self):
+        self.dbg = Debug()
+
         ctrlIdx = 0
         self.ctrl = XboxController(ctrlIdx)
 
