@@ -1,5 +1,6 @@
 from wpilib import DigitalInput
 from utils.singleton import Singleton
+from utils.units import in2m
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from debugMaster.debug import Debug
 
@@ -25,9 +26,22 @@ class Constants:
     OPTICAL_SENSOR_2_DIO_CHANNEL=6
     
     # Mechanical #
-    PLANETARY_GEAR_3TO1 = 2.89
-    PLANETARY_GEAR_4TO1 = 3.61
-    PLANETARY_GEAR_5TO1 = 5.23
+    UPLANETARY_3TO1 = 2.89
+    UPLANETARY_4TO1 = 3.61
+    UPLANETARY_5TO1 = 5.23
+
+    TRANSFER_GEAR_ON_UPLANETARY = 26
+    TRANSFER_GEAR_ON_SQUISHY = 42
+
+    TRANSFER_REDUCTION = 10*UPLANETARY_4TO1 * UPLANETARY_5TO1 * TRANSFER_GEAR_ON_SQUISHY / TRANSFER_GEAR_ON_UPLANETARY
+    SQUISH_FACTOR = 0.8
+    TRANSFER_SQUISHY_CIRC_M = SQUISH_FACTOR*in2m(1.0)*2.0*3.14
+
+    TRANSFER_MPS_PER_RPS = TRANSFER_SQUISHY_CIRC_M / TRANSFER_REDUCTION
+
+    EXP_TRANSFER_INTAKE_MPS = 0.01
+
+    EXP_TRANSFER_MOTOR_RPS = EXP_TRANSFER_INTAKE_MPS / TRANSFER_MPS_PER_RPS
 
 class Intake(metaclass=Singleton):
     def __init__(self):
@@ -95,7 +109,43 @@ class NoteHandler(metaclass=Singleton):
         self.shootCmd = False # Prep shooter and fire
         self.cancelHandlingCmd = False # DANGER: Reset entire process (also temporarily used post-shot)
 
+        self.manualNoteHandlerControls = True # Bypass state-machine, test with joysticks, debugging only
+        self.manualIntakeVelFactor = 0.0
+        self.manualTransferVelFactor = 0.0
+        self.manualShooterVelFactor = 0.0
+
+    def setIntakeStartCmd(self, value: bool):
+        self.intakeStartCmd = value
+    def setShootCmd(self, value: bool):
+        self.shootCmd = value
+    def setCancelHandlingCmd(self, value: bool):
+        self.cancelHandlingCmd = value
+
+    def setManualIntakeVelFactor(self, value: float):
+        self.manualIntakeVelFactor = value
+    def setManualTransferVelFactor(self, value: float):
+        self.manualTransferVelFactor = value
+    def setManualShooterVelFactor(self, value: float):
+        self.manualShooterVelFactor = value
+
+    def scaledIntakeVelocityRps(self):
+        # TODO: This makes the assumption that intake and transfer have the same conversion factor
+        return self.manualIntakeVelFactor * Constants.EXP_TRANSFER_MOTOR_RPS
+    def scaledTransferVelocityRps(self):
+        return self.manualTransferVelFactor * Constants.EXP_TRANSFER_MOTOR_RPS
+    def scaledShooterVelocityRps(self):
+        maxVelocityRpm = 5000.0
+        maxVelocityRps = maxVelocityRpm / 60.0
+        return self.manualShooterVelFactor * maxVelocityRps
+
+
     def update(self):
+        if self.manualNoteHandlerControls:
+            self.intake.setVelRPS(self.scaledIntakeVelocityRps())
+            self.transfer.setVelRPS(self.scaledTransferVelocityRps())
+            self.shooter.setVelRPS(self.scaledShooterVelocityRps())
+            return
+
         if self.cancelHandlingCmd:
             self.currentState = "idle"
 
