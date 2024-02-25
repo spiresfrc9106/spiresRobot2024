@@ -29,9 +29,9 @@ class DriverInterface:
         self.gyroResetCmd = False
         self.connectedFault = Fault(f"Driver XBox Controller ({ctrlIdx}) Unplugged")
 
-        self.initIntake = False
-        self.initAiming = False
-        self.initPropel = False
+        self.startIntake = False
+        self.startShooter = False
+        self.cancelNoteHandling = False
 
         self.velXSlewRateLimiter = SlewRateLimiter(rateLimit=MAX_TRANSLATE_ACCEL_MPS2)
         self.velYSlewRateLimiter = SlewRateLimiter(rateLimit=MAX_TRANSLATE_ACCEL_MPS2)
@@ -94,13 +94,13 @@ class DriverInterface:
             self.connectedFault.setFaulted()
 
         if self.aimer.isConnected():
-            self.initIntake = self.aimer.getYButtonPressed()
-            self.initAiming = self.aimer.getAButtonPressed()
-            self.initPropel = self.aimer.getXButtonPressed()
+            self.startIntake = self.aimer.getYButtonPressed()
+            self.startShooter = self.aimer.getAButtonPressed()
+            self.cancelNoteHandling = self.aimer.getBButtonPressed()
         else:
-            self.initIntake = False
-            self.initAiming = False
-            self.initPropel = False
+            self.startIntake = False
+            self.startShooter = False
+            self.cancelNoteHandling = False
 
         log("DI fieldR Cmd", self.fieldRelative, "bool")
         log("DI FwdRev Cmd", self.velXCmd, "mps")
@@ -129,12 +129,12 @@ class DriverInterface:
         """
         return self.velTCmd
 
-    def getIntakeActive(self):
-        return self.initIntake
-    def getAimingActive(self):
-        return self.initAiming
-    def getPropelActive(self):
-        return self.initPropel
+    def getStartIntakeCmd(self):
+        return self.startIntake
+    def getStartShooterCmd(self):
+        return self.startShooter
+    def getCancelNoteHandlingCmd(self):
+        return self.cancelNoteHandling
 
     def getGyroResetCmd(self):
         """_summary_

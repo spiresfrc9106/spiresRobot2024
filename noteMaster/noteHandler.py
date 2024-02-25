@@ -1,12 +1,10 @@
 from wpilib import DigitalInput
 from utils.singleton import Singleton
-#from utils import constants, faults
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from debugMaster.debug import Debug
 
 
 class Constants:
-
     USE_AFF = True
     SPEED_FACTOR = 1
 
@@ -23,27 +21,13 @@ class Constants:
     TRANSFER2_SPARK_MAX_ID = 13
     SHOOTER1_SPARK_MAX_ID = 14
     SHOOTER2_SPARK_MAX_ID = 15
+    OPTICAL_SENSOR_1_DIO_CHANNEL=4
+    OPTICAL_SENSOR_2_DIO_CHANNEL=6
     
     # Mechanical #
     PLANETARY_GEAR_3TO1 = 2.89
     PLANETARY_GEAR_4TO1 = 3.61
     PLANETARY_GEAR_5TO1 = 5.23
-
-
-class NoteState:
-    ApproachingNote = "DrivingTowards"  # ^ ctrl - intake-transfer motors on
-    DockingTransfer = "EntersTransfer"  # ^ 1st optical sensor triggers once
-    ExitingTransfer = "ExitedTransfer"  # ^ 2nd optical sensor triggers once (1st does trigger second time)
-    StoppingForward = "HaltingForward"  # turn off all motors (intake, transfer)
-    ReversingAction = "ReverseActions"  # reverse transfer motors [at slow speed]
-    StoppingReverse = "HaltingReverse"  # stop transfer motors from reversing
-    ShooterPrepared = "ShooterPrepped"  # the system is at rest awaiting drivers to commence shooting
-    AimingActivated = "ShooterReadied"  # ^ ctrl - shooter motors on, pick up to speed
-    TransferNudging = "NudgeNoteShoot"  # ^ ctrl - transfer on, nudges note, shooter remains on
-    PropelSucceeded = "ShotSuccessful"  # ^ given by amp Δ or time-based cancel?
-    NoteJourneyDone = "TrackCompleted"  # power off transfer + shooter
-    DefaultEmpty = "DefaultEmptied"     # normal driving around state
-
 
 class Intake(metaclass=Singleton):
     def __init__(self):
@@ -57,7 +41,6 @@ class Intake(metaclass=Singleton):
 
     def getEstAFF(self, velocityRPS):
         return 0.12 * velocityRPS + 0.10
-
 
 class Transfer(metaclass=Singleton):
     def __init__(self):
@@ -74,7 +57,6 @@ class Transfer(metaclass=Singleton):
 
     def getEstAFF(self, velocityRPS):
         return 0.12 * velocityRPS + 0.10
-
 
 class Shooter(metaclass=Singleton):
     def __init__(self):
@@ -95,118 +77,87 @@ class Shooter(metaclass=Singleton):
 
 class Optical(metaclass=Singleton):
     def __init__(self):
-        self.sensor1 = DigitalInput(4)  #5
-        self.sensor2 = DigitalInput(6)
-
-
-# class NoteStateMachine:
-#     def __init__(self):
-#         self.initial_state = "idle"
-#         self.current_state = self.initial_state
-#         self.initState_transition_endState = {
-#             "idle": {
-#                 "initiateIntake": "drivingTowards"
-#             },
-#             "drivingTowards": {
-#                 "opticalTrue1": "enteringTransfer",
-#                 "cancelIntake": "idle"
-#             },
-#             "enteringTransfer": {
-#                 "opticalTrue2": "exitingTransfer"
-#             },
-#             "exitingTransfer": {
-#                 "noteInRightSpot": "readyToShoot",
-#                 "noteNeedsAdjustment": "reverseTransferAdjustment"
-#             },
-#             "reverseTransferAdjustment": {
-#                 "noteInRightSpot": "shooterLoaded"
-#             },
-#             "shooterLoaded": {
-#                 "shooterStart": "startingShooter"
-#             },
-#             "startingShooter": {
-#                 "shooterReady": "awaitingTrigger"
-#             },
-#             "awaitingTrigger": {
-#                 "triggerPressed": "pushingNote"
-#             },
-#             "pushingNote": {
-#                 "noteReleased": "systemReset"
-#             },
-#             "systemReset": {
-#                 "motorsStopped": "idle"
-#             },
-#         }
+        self.sensor1 = DigitalInput(Constants.OPTICAL_SENSOR_1_DIO_CHANNEL)
+        self.sensor2 = DigitalInput(Constants.OPTICAL_SENSOR_2_DIO_CHANNEL)
 
 
 class NoteHandler(metaclass=Singleton):
     def __init__(self):
-        # initiate motors, etc
-
         self.intake = Intake()
         self.transfer = Transfer()
         self.shooter = Shooter()
         self.optical = Optical()
         self.debug = Debug()
 
-        self.prevState = NoteState.DefaultEmpty
-        self.currentState = NoteState.DefaultEmpty
+        self.currentState = "idle"
 
-        self.intakeCmd = False # Start intake roller
-        self.aimingCmd = False # Accelerate shooter up to speed
-        self.propelCmd = False # Nudge note from transfer to shooter
-
-
-    def switch(self, state):
-        self.currentState = state
+        self.intakeStartCmd = False # Start intake roller
+        self.shootCmd = False # Prep shooter and fire
+        self.cancelHandlingCmd = False # DANGER: Reset entire process (also temporarily used post-shot)
 
     def update(self):
-        self.debug.print("note", self.optical.sensor1.get())
-        if self.currentState != self.prevState:
-            self.debug.print("note", f"switching from {self.prevState} to {self.currentState}")
-            self.prevState = self.currentState
+        if self.cancelHandlingCmd:
+            self.currentState = "idle"
+
         match self.currentState:
-            case NoteState.DefaultEmpty:
+            case "idle":
+                self.cancelHandlingCmd = False
                 self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(0)
                 self.shooter.setVelRPS(0)
-                if self.intakeCmd:
-                    self.switch(NoteState.ApproachingNote)
-            case NoteState.ApproachingNote:
+                if self.intakeStartCmd:
+                    self.currentState = "intakeActive"
+            case "intakeActive":
+                self.intakeStartCmd = False
                 self.intake.setVelRPS(Constants.INTAKE_VEL_RPS)
+                self.transfer.setVelRPS(0)
+                self.shooter.setVelRPS(0)
+                if self.optical.sensor1.get():
+                    self.currentState = "transferForward"
+            case "transferForward":
+                self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(Constants.TRANSFER_FORWARD_VEL_RPS)
-                if not self.optical.sensor1.get():
-                    self.switch(NoteState.DockingTransfer)
-            case NoteState.DockingTransfer:
-                if not self.optical.sensor2.get():
-                    self.switch(NoteState.ExitingTransfer)
-            case NoteState.ExitingTransfer:
-                self.switch(NoteState.StoppingForward)
-            case NoteState.StoppingForward:
+                self.shooter.setVelRPS(0)
+                # this transition assumes that we will not miss a sensor reading
+                if self.optical.sensor2.get():
+                    self.currentState = "transferForwardComplete"
+            case "transferForwardComplete":
                 self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(0)
-                if self.transfer.motor1.getVelRPS() < 1.0:
-                    self.switch(NoteState.ReversingAction)
-            case NoteState.ReversingAction:
+                self.shooter.setVelRPS(0)
+                # TODO: validate this threshold
+                if self.transfer.motor1.getVelRPS() < Constants.TRANSFER_FORWARD_VEL_RPS * 0.1:
+                    if self.optical.sensor2.get():
+                        self.currentState = "readyToShoot"
+                    else:
+                        self.currentState = "transferRevAdjust"
+            case "transferRevAdjust":
+                self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(Constants.TRANSFER_REVERSE_VEL_RPS)
-            case NoteState.StoppingReverse:
+                self.shooter.setVelRPS(0)
+                # this transition assumes that we will not miss a sensor reading
+                # We could also maybe make the adjustment based on a known rotation of the transfer motor
+                if self.optical.sensor2.get():
+                    self.currentState = "readyToShoot"
+            case "readyToShoot":
+                self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(0)
-            case NoteState.ShooterPrepared:
-                if self.aimingCmd:
-                    self.switch(NoteState.AimingActivated)
-            case NoteState.AimingActivated:
+                self.shooter.setVelRPS(0)
+                if self.shootCmd:
+                    self.currentState = "warmupShooter"
+            case "warmupShooter":
+                self.intake.setVelRPS(0)
+                self.transfer.setVelRPS(0)
                 self.shooter.setVelRPS(Constants.SHOOTER_VEL_RPS)
-                if self.propelCmd:
-                    self.switch(NoteState.TransferNudging)
-            case NoteState.TransferNudging:
+                # TODO: validate this threshold 
+                if self.shooter.motor1.getVelRPS() > Constants.SHOOTER_VEL_RPS * 0.95:
+                    self.currentState = "shooting"
+            case "shooting":
+                self.intake.setVelRPS(0)
                 self.transfer.setVelRPS(Constants.TRANSFER_NUDGING_VEL_RPS)
-                # @yavin need some sort of auto-driven functionality to wait until shooting success
-            case NoteState.PropelSucceeded:
-                self.intake.setVelRPS(0)
-                self.transfer.setVelRPS(0)
-                self.shooter.setVelRPS(0)
+                self.shooter.setVelRPS(Constants.SHOOTER_VEL_RPS)
+                if self.cancelHandlingCmd:
+                    self.currentState = "idle"
             case _:
-                self.debug.print("error", "error with state machine; no value found")
-                self.intake.setVelRPS(0)
-                self.transfer.setVelRPS(0)
-                self.shooter.setVelRPS(0)
+                self.debug.print("error", f"Unexpected state in Note Handler: {self.currentState}")
+                self.currentState = "idle"

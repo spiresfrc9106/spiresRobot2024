@@ -168,9 +168,9 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
-        self.noteHandler.intakeCmd = self.dInt.getIntakeActive()
-        self.noteHandler.aimingCmd = self.dInt.getAimingActive()
-        self.noteHandler.propelCmd = self.dInt.getPropelActive()
+        self.noteHandler.intakeStartCmd = self.dInt.getStartIntakeCmd()
+        self.noteHandler.shootCmd = self.dInt.getStartShooterCmd()
+        self.noteHandler.cancelHandlingCmd = self.dInt.getCancelNoteHandlingCmd()
 
 
     #########################################################
