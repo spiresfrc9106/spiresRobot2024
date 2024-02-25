@@ -141,8 +141,15 @@ class NoteHandler(metaclass=Singleton):
         maxVelocityRps = maxVelocityRpm / 60.0
         return self.manualShooterVelFactor * maxVelocityRps
 
+    def logMotorValues(self):
+        motors = [self.intake.motor1, self.transfer.motor1, self.transfer.motor2, self.shooter.motor1, self.shooter.motor2]
+        for motor in motors:
+            motor.getVelRPS()
+            motor.getAppliedOutput()
 
     def update(self):
+        self.logMotorValues()
+
         if self.manualNoteHandlerControls:
             self.intake.setVelRPS(self.scaledIntakeVelocityRps())
             self.transfer.setVelRPS(self.scaledTransferVelocityRps())
