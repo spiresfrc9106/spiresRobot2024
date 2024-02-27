@@ -67,13 +67,6 @@ class DriverInterface:
             self.velYCmd = self.velYSlewRateLimiter.calculate(velYCmdRaw)
             self.velTCmd = self.velTSlewRateLimiter.calculate(velTCmdRaw)
 
-            # TODO: this should be necessary, but something else is causing a red alliance inversion
-            # Once we resolve that issue we can bring this back
-            # Adjust the commands if we're on the opposite side of the feild
-            # if onRed() and self.fieldRelative:
-            #     self.velXCmd *= -1
-            #     self.velYCmd *= -1
-
             self.gyroResetCmd = self.ctrl.getAButtonPressed()
 
             self.connectedFault.setNoFault()
