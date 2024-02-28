@@ -2,6 +2,7 @@ import sys
 import gc
 import wpilib
 from Autonomous.modes.driveOut import DriveOut
+from climberControl.climberControl import ClimberControl
 from humanInterface.operatorInterface import OperatorInterface
 from robotConfig import webserverConstructorOrNone
 from robotConfig import dashboardOrNone
@@ -48,6 +49,7 @@ class MyRobot(wpilib.TimedRobot):
         self.webserver = webserverConstructorOrNone()
 
         self.driveTrain = DrivetrainControl()
+        self.climberControl = ClimberControl()
 
         self.dInt = DriverInterface()
         self.opInt = OperatorInterface()
@@ -107,6 +109,8 @@ class MyRobot(wpilib.TimedRobot):
         self.driveTrain.update()
         self.stt.perhapsMark(self.markDriveTrainName)
         self.ledCtrl.update()
+
+        self.climberControl.update()
 
         self.noteHandler.update()
 
@@ -171,6 +175,12 @@ class MyRobot(wpilib.TimedRobot):
             self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
+
+        if self.opInt.getClimberCmd():
+            self.climberControl.setClimberSpeed(1) # TODO: determine an appropriate climb speed
+        else:
+            self.climberControl.setClimberSpeed(0)
+
 
         self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()
         self.noteHandler.shootCmd = self.opInt.getStartShooterCmd()

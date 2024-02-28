@@ -15,6 +15,8 @@ class OperatorInterface:
         self.startShooter = False
         self.cancelNoteHandling = False
 
+        self.climberCmd = False
+
         # Only used for manual testing
         self.manualIntakeVelFactor = 0.0
         self.manualTransferVelFactor = 0.0
@@ -38,11 +40,15 @@ class OperatorInterface:
             self.manualTransferVelFactor = applyDeadband(transferRaw, 0.05)
             self.manualShooterVelFactor = applyDeadband(shooterRaw, 0.05)
 
+            self.climberCmd = self.ctrl.getRightBumper()
+
             self.connectedFault.setNoFault()
         else:
             self.startIntake = False
             self.startShooter = False
             self.cancelNoteHandling = False
+
+            self.climberCmd = False
 
             self.manualIntakeVelFactor = 0.0
             self.manualTransferVelFactor = 0.0
@@ -56,6 +62,9 @@ class OperatorInterface:
         return self.startShooter
     def getCancelNoteHandlingCmd(self):
         return self.cancelNoteHandling
+
+    def getClimberCmd(self):
+        return self.climberCmd
 
     def getManualIntakeVelocityFactory(self):
         return self.manualIntakeVelFactor
