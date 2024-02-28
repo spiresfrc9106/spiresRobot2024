@@ -2,6 +2,8 @@ from wpimath.geometry import Pose2d
 from wpilib import DriverStation
 from AutoSequencerV2.modeList import ModeList
 from AutoSequencerV2.builtInModes.doNothingMode import DoNothingMode
+#from AutoSequencerV2.builtInCtrl.caliCtrl import CaliCtrl
+#from AutoSequencerV2.builtInCtrl.xboxCtrl import XboxCtrl
 from AutoSequencerV2.builtInModes.waitMode import WaitMode
 from AutoSequencerV2.sequentialCommandGroup import SequentialCommandGroup
 from utils.singleton import Singleton
@@ -13,6 +15,10 @@ class AutoSequencer(metaclass=Singleton):
 
     def __init__(self):
         # Have different delay modes for delaying the start of autonomous
+        # self.ctrlModeList = ModeList("Ctrl")
+        # self.ctrlModeList.addMode(XboxCtrl())
+        # self.ctrlModeList.addMode(CaliCtrl())
+
         self.delayModeList = ModeList("Delay")
         self.delayModeList.addMode(WaitMode(0.0))
         self.delayModeList.addMode(WaitMode(3.0))
@@ -45,17 +51,19 @@ class AutoSequencer(metaclass=Singleton):
     # Call this periodically while disabled to keep the dashboard updated
     # and, when things change, re-init modes
     def updateMode(self, force=False):
+        # ctrlChanged = self.ctrlModeList.updateMode()
         mainChanged = self.mainModeList.updateMode()
         delayChanged = self.delayModeList.updateMode()
         if mainChanged or delayChanged or force or self._allianceChanged():
             mainMode = self.mainModeList.getCurMode()
             delayMode = self.delayModeList.getCurMode()
+            # ctrlMode = self.ctrlModeList.getCurMode()
             self.topLevelCmdGroup = delayMode.getCmdGroup().andThen(
                 mainMode.getCmdGroup()
             )
             self.startPose = mainMode.getInitialDrivetrainPose()
             print(
-                f"[Auto] New Modes Selected: {DriverStation.getAlliance()} {delayMode.getName()}, {mainMode.getName()}"
+                f"[Auto] New Modes Selected:  {DriverStation.getAlliance()} {delayMode.getName()}, {mainMode.getName()}"
             )
 
     # Call this once during autonmous init to init the current command sequence

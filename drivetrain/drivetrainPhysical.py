@@ -1,15 +1,14 @@
 import math
-from wpilib import SPI
 from wpimath.units import inchesToMeters
 from wpimath.system.plant import DCMotor
 from wpimath.geometry import Translation2d
 from wpimath.kinematics import SwerveDrive4Kinematics
-from wpimath.geometry import Rotation2d
-import navx
 from utils.units import lbsToKg
 from utils.units import deg2Rad
 from utils.units import in2m
 from wrappers.wrapperedRevThroughBoreEncoder import WrapperedRevThroughBoreEncoder
+from drivetrain.robotDependentConstants import RobotDependentConstants
+from config import ROBOT_BUILD
 
 # pylint: disable=R0801
 
@@ -18,12 +17,16 @@ Defines the physical dimensions and characteristics of the drivetrain
 """
 
 ###################################################################
+
+constants = RobotDependentConstants().get()[ROBOT_BUILD]
+
+###################################################################
 # Physical dimensions and mass distribution
 
 # Wheel base half width: Distance from the center of the frame rail
 # out to the center of the "contact patch" where the wheel meets the ground
-WHEEL_BASE_HALF_WIDTH_M = inchesToMeters(16.5 / 2.0)
-WHEEL_BASE_HALF_LENGTH_M = inchesToMeters(26.5 / 2.0)
+WHEEL_BASE_HALF_WIDTH_M = inchesToMeters(constants["WIDTH"] / 2.0)
+WHEEL_BASE_HALF_LENGTH_M = inchesToMeters(constants["LENGTH"] / 2.0)
 
 # Additional distance from the wheel contact patch out to the edge of the bumper
 BUMPER_THICKNESS_M = inchesToMeters(2.5)
@@ -103,18 +106,19 @@ MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = (
 # 3 - Using a square, twist the modules by hand until they are aligned with the robot's chassis
 # 4 - Read out the encoder readings for each module, put them here
 # 5 - Redeploy code, verify that the  encoder readings are correct as each module is manually rotated
-FL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 110)
-FR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 40 - 14)
-BL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 - 45 - 10 - 4)
-BR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(0 + 70 + 5)
+FL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(constants["FL_OFFSET"])
+FR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(constants["FR_OFFSET"])
+BL_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(constants["BL_OFFSET"])
+BR_ENCODER_MOUNT_OFFSET_RAD = deg2Rad(constants["BR_OFFSET"])
 
 # Perhaps we invert the swerve module azimuth motor
 INVERT_AZMTH_MOTOR = False
+INVERT_AZMTH_ENCODER = True
 
 # Perhaps we invert the swerve module wheel motor drive direction
-FL_INVERT_WHEEL_MOTOR = True
+FL_INVERT_WHEEL_MOTOR = False
 FR_INVERT_WHEEL_MOTOR = False
-BL_INVERT_WHEEL_MOTOR = True
+BL_INVERT_WHEEL_MOTOR = False
 BR_INVERT_WHEEL_MOTOR = False
 
 # Module Indices (for ease of array manipulation)
@@ -124,56 +128,28 @@ BL = 2
 BR = 3
 
 # Function make a swerve module azimuth encoder reader object
-def wrapperedSwerveDriveAzmthEncoder(azmthEncoderPortIdx, moduleName, azmthOffsetRad):
+def wrapperedSwerveDriveAzmthEncoder(azmthEncoderPortIdx, moduleName, azmthOffsetRad, inverted):
     return WrapperedRevThroughBoreEncoder(
         port=azmthEncoderPortIdx,
         name=moduleName,
         mountOffsetRad=azmthOffsetRad,
-        dirInverted=True
+        dirInverted=inverted
     )
-
-class NoGyro():
-
-    def __init__(self):
-        pass
-
-    def getRotation2d(self):
-        return Rotation2d(0.0)
-
-    def isConnected(self):
-        return False
-
-
-
-# Function make gyro object
-def wrapperedGyro():
-    """
-     5. __init__(self: navx._navx.AHRS,
-        spi_port_id: wpilib._wpilib.SPI.Port, spi_bitrate: int, update_rate_hz: int) -> None
-
-    :param port: SPI Port to use
-    :type port: :class:`.SPI.Port`
-    :param spi_bitrate: SPI bitrate (Maximum:  2,000,000)
-    :param update_rate_hz: Custom Update Rate (Hz)
-    """
-    result = navx.AHRS(spi_port_id=SPI.Port.kMXP, spi_bitrate=1000000, update_rate_hz=50)
-    #result = NoGyro()
-    return result
 
 
 # Array of translations from robot's origin (center bottom, on floor) to the module's contact patch with the ground
 robotToModuleTranslations = []
 robotToModuleTranslations.append(
-    Translation2d(WHEEL_BASE_HALF_WIDTH_M, WHEEL_BASE_HALF_LENGTH_M)
+    Translation2d(WHEEL_BASE_HALF_LENGTH_M, WHEEL_BASE_HALF_WIDTH_M)
 )
 robotToModuleTranslations.append(
-    Translation2d(WHEEL_BASE_HALF_WIDTH_M, -WHEEL_BASE_HALF_LENGTH_M)
+    Translation2d(WHEEL_BASE_HALF_LENGTH_M, -WHEEL_BASE_HALF_WIDTH_M)
 )
 robotToModuleTranslations.append(
-    Translation2d(-WHEEL_BASE_HALF_WIDTH_M, WHEEL_BASE_HALF_LENGTH_M)
+    Translation2d(-WHEEL_BASE_HALF_LENGTH_M, WHEEL_BASE_HALF_WIDTH_M)
 )
 robotToModuleTranslations.append(
-    Translation2d(-WHEEL_BASE_HALF_WIDTH_M, -WHEEL_BASE_HALF_LENGTH_M)
+    Translation2d(-WHEEL_BASE_HALF_LENGTH_M, -WHEEL_BASE_HALF_WIDTH_M)
 )
 
 # WPILib Kinematics object

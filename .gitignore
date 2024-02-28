@@ -8,3 +8,4 @@ networktables.json
 # 9106 specific ignores
 /venv*
 /.idea
+simgui.json

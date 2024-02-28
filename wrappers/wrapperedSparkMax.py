@@ -10,9 +10,10 @@ from utils.faults import Fault
 # Physical unit conversions into SI units (radians)
 # Retry logic for initial configuration
 # Fault handling for not crashing code if the motor controller is disconnected
-# Fault annunication logic to trigger warnings if a motor couldn't be configured
+# Fault annunciation logic to trigger warnings if a motor couldn't be configured
+
 class WrapperedSparkMax:
-    def __init__(self, canID, name, brakeMode=False):
+    def __init__(self, canID, name, brakeMode=False, curLimitA=40):
         self.ctrl = CANSparkMax(canID, CANSparkLowLevel.MotorType.kBrushless)
         self.pidCtrl = self.ctrl.getPIDController()
         self.encoder = self.ctrl.getEncoder()
@@ -32,7 +33,7 @@ class WrapperedSparkMax:
                 else CANSparkMax.IdleMode.kCoast
             )
             errList.append(self.ctrl.setIdleMode(mode))
-            errList.append(self.ctrl.setSmartCurrentLimit(40))
+            errList.append(self.ctrl.setSmartCurrentLimit(curLimitA))
             # Status 0 = Motor output and Faults
             errList.append(
                 self.ctrl.setPeriodicFramePeriod(CANSparkMax.PeriodicFrame.kStatus0, 20)
@@ -94,6 +95,16 @@ class WrapperedSparkMax:
         log(self.name + "_arbFF", arbFF, "V")
         self._logCurrent()
 
+    def setVelRPS(self, speed, aff=0.0):
+        rpm = 60 * speed
+        command = RPM2RadPerSec(rpm)
+        self.setVelCmd(command, arbFF=aff)
+
+    def getVelRPS(self):
+        rpm = radPerSec2RPM(self.getMotorVelocityRadPerSec())
+        rps = rpm / 60
+        return rps
+
     def setVoltage(self, outputVoltageVolts):
         log(self.name + "_cmdVoltage", outputVoltageVolts, "V")
         if self.connected:
@@ -116,5 +127,18 @@ class WrapperedSparkMax:
             vel = self.encoder.getVelocity()
         else:
             vel = 0
-        log(self.name + "_motorActVel", vel, "RPM")
+        vel = vel/60
+        log(self.name + "_motorActVel", vel, "RPS")
         return RPM2RadPerSec(vel)
+
+    def getAppliedOutput(self):
+        if self.connected:
+            output = self.ctrl.getAppliedOutput()
+        else:
+            output = 0
+        output = 12 * output
+        log(self.name + "_estOutputV", output, "V")
+        return output
+
+    def setSmartCurrentLimit(self):
+        pass

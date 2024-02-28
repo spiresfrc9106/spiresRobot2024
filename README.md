@@ -92,11 +92,18 @@ Note any folder or file prefixed with a `.` will be skipped in the deploy.
 
 ## Linting
 
+Yavin clutch code:
+
+```
+pylint --rcfile=.pylintrc **\*.py
+```
+
 "Linting" is the process of checking our code format and style to keep it looking nice
 
 `lint.bat` will execute the linter.
 
 `.pylintrc` contains configuration about what checks the linter runs, and what formatting it enforces
+
 
 ## Testing
 
@@ -114,9 +121,15 @@ Github runs our code on its servers on every commit to ensure our code stays hig
 
 To minimize frustration and rework, before committing, be sure to:
 
-1. Run the test suite
-2. Run `lint.bat` and fix any formatting errors
 
+1. Run lint and fix any formatting errors
+```cmd
+pylint --rcfile=.pylintrc $(git ls-files '*.py')
+```
+2. Run the test suite
+```cmd
+python -m robotpy test
+```
 ## RIO First-time Installation
 
 Follow [the robotpy instructions for setting up the RIO](https://robotpy.readthedocs.io/en/stable/install/robot.html)

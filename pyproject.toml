@@ -7,7 +7,7 @@
 
 # Version of robotpy this project depends on
 # to see what versions are available: https://pypi.org/pypi/robotpy/json
-robotpy_version = "2024.1.1.3"
+robotpy_version = "2024.3.1.0"
 
 
 # Which extra RobotPy components should be installed
@@ -21,7 +21,7 @@ robotpy_extras = [
     # "pathplannerlib"
     # "phoenix5"
     # "phoenix6"
-    # "playingwithfusion"
+    "playingwithfusion",
     "rev",
     # "romi"
     "sim",
@@ -30,9 +30,9 @@ robotpy_extras = [
 
 # Other pip packages to install
 requires = [
-    "photonlibpy",
+    "photonlibpy==2024.2.4",
     "debugpy==1.6.7",
-    "robotpy-commands-v2==2024.0.0b4",
+    #"robotpy-commands-v2==2024.0.0b4",
     #"numpy==1.26.3"
     #"numpy==1.25.2",
     "robotpy-navx==2024.1.0"
