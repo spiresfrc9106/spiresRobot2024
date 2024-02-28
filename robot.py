@@ -78,7 +78,7 @@ class MyRobot(wpilib.TimedRobot):
         print(f"after:1:{len(gc.get_objects(generation=1))}")
         print(f"after:2:{len(gc.get_objects(generation=2))}")
 
-        self.noteHandler = NoteHandler()
+        # self.noteHandler = NoteHandler()
 
         self.dbg = Debug()
         self.dbg.toPrint.update({'velState': False})
@@ -112,7 +112,7 @@ class MyRobot(wpilib.TimedRobot):
 
         self.climberControl.update()
 
-        self.noteHandler.update()
+        # self.noteHandler.update()
 
         SignalWrangler().publishPeriodic()
         self.stt.perhapsMark(self.markSignalWranglerName)
@@ -182,9 +182,9 @@ class MyRobot(wpilib.TimedRobot):
             self.climberControl.setClimberSpeed(0)
 
 
-        self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()
-        self.noteHandler.shootCmd = self.opInt.getStartShooterCmd()
-        self.noteHandler.cancelHandlingCmd = self.opInt.getCancelNoteHandlingCmd()
+        # self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()
+        # self.noteHandler.shootCmd = self.opInt.getStartShooterCmd()
+        # self.noteHandler.cancelHandlingCmd = self.opInt.getCancelNoteHandlingCmd()
 
 
     #########################################################
