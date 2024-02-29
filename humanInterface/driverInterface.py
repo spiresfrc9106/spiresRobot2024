@@ -45,7 +45,7 @@ class DriverInterface:
             # Convert from joystic sign/axis conventions to robot velocity conventions
             vXJoyRaw = -1.0 * self.ctrl.getLeftY()
             vYJoyRaw = -1.0 * self.ctrl.getLeftX()
-            vTJoyRaw = -1.0 * self.ctrl.getRightX()
+            vTJoyRaw =  1.0 * self.ctrl.getRightX()
 
             # Apply deadband to make sure letting go of the joystick actually stops the bot
             vXJoy = applyDeadband(vXJoyRaw, 0.15)
