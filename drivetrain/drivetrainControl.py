@@ -144,6 +144,7 @@ class DrivetrainControl(metaclass=Singleton):
         # but aligned facing downfield
         curTranslation = self.poseEst.getCurEstPose().translation()
         newGyroRotation = Rotation2d.fromDegrees(180.0) if(onRed()) else Rotation2d.fromDegrees(0.0)
+        #try: newGyroRotation = Rotation2d.fromDegrees(0.0) if(onRed()) else Rotation2d.fromDegrees(180.0)
         newPose = Pose2d(curTranslation, newGyroRotation)
         self.poseEst.setKnownPose(newPose)
 

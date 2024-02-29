@@ -67,6 +67,11 @@ class DriverInterface:
             self.velYCmd = self.velYSlewRateLimiter.calculate(velYCmdRaw)
             self.velTCmd = self.velTSlewRateLimiter.calculate(velTCmdRaw)
 
+            # Adjust the commands if we're robot relative
+            if onRed() or not self.fieldRelative:
+                self.velXCmd *= -1
+                self.velYCmd *= -1
+
             self.gyroResetCmd = self.ctrl.getAButtonPressed()
 
             self.connectedFault.setNoFault()

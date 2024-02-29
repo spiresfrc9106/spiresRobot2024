@@ -46,11 +46,12 @@ WHEEL_GEAR_RATIO_L1 = 8.41
 WHEEL_GEAR_RATIO_L2 = 6.75
 WHEEL_GEAR_RATIO_L2 = 6.12
 AZMTH_GEAR_RATIO = 4.71  # TODO FIX ME UP
+#doAZMTH_GEAR_RATIO = 46.42
 
-WHEEL_GEAR_RATIO_MAX_SWERVE_L2 = 4.71
+#wsa: WHEEL_GEAR_RATIO_MAX_SWERVE_L2 = 4.71
 
 ### CHANGE THIS DEPENDING ON WHICH MODULE GEAR RATIO IS INSTALLED
-WHEEL_GEAR_RATIO = WHEEL_GEAR_RATIO_MAX_SWERVE_L2
+WHEEL_GEAR_RATIO = constants["MAX_SWERVE_WHEEL_GEAR_RATIO"]
 
 # carpet/roughtop interface fudge factor
 # This accounts for the fact that roughtop tread
@@ -62,7 +63,7 @@ WHEEL_FUDGE_FACTOR = 0.9238
 
 # Nominal 4-inch diameter swerve drive wheels
 # https:#www.swervedrivespecialties.com/collections/mk4i-parts/products/billet-wheel-4d-x-1-5w-bearing-bore
-WHEEL_RADIUS_IN = 3.0 / 2.0 * WHEEL_FUDGE_FACTOR
+WHEEL_RADIUS_IN = constants["SWERVE_WHEEL_DIAMETER_IN"] / 2.0 * WHEEL_FUDGE_FACTOR
 
 
 # Utility conversion functions to go between drivetrain "linear" measurements and wheel motor rotational measurements

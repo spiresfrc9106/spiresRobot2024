@@ -2,6 +2,10 @@ class RobotDependentConstants:
     def __init__(self):
         self.robotConstants = {
             '2023': {
+                "MAX_SWERVE_WHEEL_GEAR_RATIO": 5.50, # Base Low
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 5.08, # Base Medium
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 4.71, # Base High
+                "SWERVE_WHEEL_DIAMETER_IN": 3.0,
                 "WIDTH": 16.5,
                 "LENGTH": 26.5,
                 "FL_OFFSET": (-110+180),
@@ -11,6 +15,10 @@ class RobotDependentConstants:
                 "GYRO": "NAVX", # "NAVX", # "ADIS16470_IMU",
             },
             '2023sim': {
+                "MAX_SWERVE_WHEEL_GEAR_RATIO": 5.50, # Base Low
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 5.08, # Base Medium
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 4.71, # Base High
+                "SWERVE_WHEEL_DIAMETER_IN": 3.0,
                 "WIDTH": 16.5,
                 "LENGTH": 26.5,
                 "FL_OFFSET": 0,
@@ -20,17 +28,25 @@ class RobotDependentConstants:
                 "GYRO": "NAVX", # "ADIS16470_IMU",
             },
             '2024': {
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 5.50, # Base Low
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 5.08, # Base Medium
+                "MAX_SWERVE_WHEEL_GEAR_RATIO": 4.71, # Base High
+                "SWERVE_WHEEL_DIAMETER_IN": 3.0,
                 "WIDTH": 22.5,
                 "LENGTH": 26.5,
-                "FL_OFFSET": 265,
-                "FR_OFFSET": 57,
-                "BL_OFFSET": 487,
-                "BR_OFFSET": 209,
+                "FL_OFFSET": -272.02+180,
+                "FR_OFFSET": 55.36+180,
+                "BL_OFFSET": 125.66,
+                "BR_OFFSET": 117.74-90,
                 "GYRO": "NAVX",
             },
             '2024sim': {
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 5.50, # Base Low
+                #"MAX_SWERVE_WHEEL_GEAR_RATIO": 5.08, # Base Medium
+                "MAX_SWERVE_WHEEL_GEAR_RATIO": 4.71, # Base High
+                "SWERVE_WHEEL_DIAMETER_IN": 3.0,
                 "WIDTH": 22.5,
-                "LENGTH": 3*26.5,
+                "LENGTH": 26.5,
                 "FL_OFFSET": 0,
                 "FR_OFFSET": 0,
                 "BL_OFFSET": 0,
