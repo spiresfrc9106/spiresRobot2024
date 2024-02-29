@@ -19,7 +19,8 @@ class OperatorInterface:
         self.startShooter = False
         self.cancelNoteHandling = False
 
-        self.climberCmd = False
+        self.climbCmd = 0.0 # Percentage of max climb speed
+        self.climbResetCmd = False # Re-zero climbing mechanism
 
     def update(self):
         """Main update - call this once every 20ms"""
@@ -29,7 +30,10 @@ class OperatorInterface:
             self.startShooter = self.ctrl.getAButtonPressed()
             self.cancelNoteHandling = self.ctrl.getBButtonPressed()
 
-            self.climberCmd = self.ctrl.getRightBumper()
+            leftJoyRaw = -1.0 * self.ctrl.getLeftY()
+            self.climbCmd = applyDeadband(leftJoyRaw, 0.1)
+
+            self.climbResetCmd = self.ctrl.getXButtonPressed()
 
             self.connectedFault.setNoFault()
         else:
@@ -37,7 +41,8 @@ class OperatorInterface:
             self.startShooter = False
             self.cancelNoteHandling = False
 
-            self.climberCmd = False
+            self.climberCmd = 0.0
+            self.climbResetCmd = False
 
             self.connectedFault.setFaulted()
 
