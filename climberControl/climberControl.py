@@ -1,19 +1,39 @@
+from utils.singleton import Singleton
+from utils.units import deg2Rad, in2m
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
+from wpimath.system.plant import DCMotor
 
-class ClimberControl:
-  # TODO: this implementation is unsafe because there is no
-  #       shutoff or control other than input
-  # TODO: this implementation assumes that the entire climber
-  #       is controlled by a single spark max
+
+CLIMB_SPEED_FUDGE_FACTOR = 0.95
+# radians / sec
+MAX_CLIMB_SPEED_RPS = DCMotor.NEO(1).freeSpeed * CLIMB_SPEED_FUDGE_FACTOR
+
+class ClimberControl(metaclass=Singleton):
     def __init__(self):
-        # TODO: determine the actual spark max can id
-        # TODO: this spark max can id should be moved to a constants file
-        self.motor = WrapperedSparkMax(16, "_climber", curLimitA=15)
-        self.cmdSpd = 0
+      self.hasZeroed = False
 
-    def setClimberSpeed(self, inputSpeedRPS):
-      """Set climber speed to inputSpeed with a unit of rotations per second"""
-      self.cmdSpd = inputSpeedRPS
+      # TODO: this spark max can id should be moved to a constants file
+      self.motorLeft = WrapperedSparkMax(16, "_climberLeft", brakeMode=True, curLimitA=5)
+      self.motorRight = WrapperedSparkMax(14, "_climberRight", brakeMode=True, curLimitA=5)
+      self.motorLeft.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
+      self.motorRight.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
+
+      self.climbCmd = 0.0
 
     def update(self):
-      self.motor.setVelRPS(self.cmdSpd)
+      if not self.hasZeroed:
+        # TODO: zero out climber
+        pass
+      else:
+        if self.climbCmd > 0.0:
+          self.motorLeft.setVelCmd(MAX_CLIMB_SPEED_RPS * self.climbCmd)
+          self.motorRight.setVelCmd(MAX_CLIMB_SPEED_RPS * self.climbCmd)
+        else:
+          self.motorLeft.setVoltage(0.0)
+          self.motorRight.setVoltage(0.0)
+
+    def setClimbCmd(self, cmd):
+      self.climbCmd = cmd
+
+    def resetHasZeroed(self):
+      self.hasZeroed = False

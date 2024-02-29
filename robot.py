@@ -176,10 +176,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
-        if self.opInt.getClimberCmd():
-            self.climberControl.setClimberSpeed(1) # TODO: determine an appropriate climb speed
-        else:
-            self.climberControl.setClimberSpeed(0)
+        self.climberControl.setClimbCmd(self.opInt.getClimberCmd())
 
 
         # self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()
