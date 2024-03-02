@@ -57,8 +57,6 @@ class MyRobot(wpilib.TimedRobot):
         self.ledCtrl = LEDControl()
 
         self.autoSequencer = AutoSequencer()
-        self.autoSequencer.addMode(DriveOut())
-        # self.autoSequencer.addMode(DrivePathCircle())
 
         self.dashboard = dashboardOrNone()
 
