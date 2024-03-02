@@ -6,6 +6,10 @@ from AutoSequencerV2.builtInModes.doNothingMode import DoNothingMode
 #from AutoSequencerV2.builtInCtrl.xboxCtrl import XboxCtrl
 from AutoSequencerV2.builtInModes.waitMode import WaitMode
 from AutoSequencerV2.sequentialCommandGroup import SequentialCommandGroup
+from Autonomous.modes.driveOut import DriveOut
+from Autonomous.modes.source import SourceExit
+from Autonomous.modes.speakerAngled import SpeakerAngled
+from Autonomous.modes.speakerCenter import SpeakerCenter
 from utils.singleton import Singleton
 from utils.allianceTransformUtils import onRed
 
@@ -28,6 +32,10 @@ class AutoSequencer(metaclass=Singleton):
         # Create a list of every autonomous mode we want
         self.mainModeList = ModeList("Main")
         self.mainModeList.addMode(DoNothingMode())
+        self.mainModeList.addMode(DriveOut())
+        self.mainModeList.addMode(SourceExit())
+        self.mainModeList.addMode(SpeakerCenter())
+        self.mainModeList.addMode(SpeakerAngled())
 
         self.topLevelCmdGroup = SequentialCommandGroup()
         self.startPose = Pose2d()
