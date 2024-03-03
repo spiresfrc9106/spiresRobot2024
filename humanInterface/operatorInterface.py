@@ -1,6 +1,7 @@
 from wpilib import XboxController
 from wpimath import applyDeadband
 from utils.faults import Fault
+from utils.signalLogging import log
 from . import OPERATOR_CTRL_IDX
 
 class OperatorInterface:
@@ -41,6 +42,8 @@ class OperatorInterface:
             self.climbResetCmd = False
 
             self.connectedFault.setFaulted()
+
+        log("OI climberCmd", self.climberCmd, "pct")
 
     def getStartIntakeCmd(self):
         return self.startIntake
