@@ -52,5 +52,5 @@ class OperatorInterface:
     def getCancelNoteHandlingCmd(self):
         return self.cancelNoteHandling
 
-    def getClimberCmd(self):
+    def getClimberCmdPercentage(self):
         return self.climberCmd

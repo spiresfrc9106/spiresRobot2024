@@ -171,7 +171,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
-        self.climberControl.setClimbCmd(self.opInt.getClimberCmd())
+        self.climberControl.setClimbCmdPercentage(self.opInt.getClimberCmdPercentage())
 
 
         # self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()

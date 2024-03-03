@@ -1,7 +1,7 @@
+from wpimath.system.plant import DCMotor
+from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from utils.singleton import Singleton
 from utils.units import RPM2RadPerSec
-from wrappers.wrapperedSparkMax import WrapperedSparkMax
-from wpimath.system.plant import DCMotor
 
 CLIMB_REVS_PER_INCH = 18.92 / 7.84
 # This is some back of the napkin math to ensure
@@ -24,6 +24,9 @@ MAX_CLIMB_SPEED_RAD_PER_SEC = DCMotor.NEO(1).freeSpeed * CLIMB_SPEED_FUDGE_FACTO
 
 class ClimberMotorControl():
     def __init__(self, name: str, inverted: bool, canID: int):
+        # For initial tests, it might be easiest to set this to "yes"
+        # And use joysticks to ensure other factors are correct
+        # Then test out the zeroing
         self.hasZeroed = "yes"  # xyzzy
 
         # TODO: this spark max can id should be moved to a constants file
@@ -31,59 +34,52 @@ class ClimberMotorControl():
         self.motor.setInverted(inverted)
         self.motor.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
         self.count = 0
-        self.velCmdRadPerS = 0
+        self.velCmdPercentage = 0
 
-        def update(self):
-            if self.hasZeroed == "no":
-                self.hasZeroed = "enteringZeroing"
-            elif self.hasZeroed == "enteringZeroing":
-                self.motor.setVelCmd(-ZERO_OUT_RAD_PER_SEC)
-                self.hasZeroed = "zeroing"
-                self.count = 0
-                self.velCmdRadPerS = 0
-            elif self.hasZeroed == "zeroing":
-                if self.motor.getMotorVelocityRadPerSec() > -ZERO_OUT_RAD_PER_SEC * 0.05:
-                    if self.count >= 25:
-                        self.count = 0
-                        self.motor.setVoltage(0.0)
-                        self.hasZeroed = "yes"
-                    else:
-                        self.count += 1
-            elif self.hasZeroed == "yes":
-                self.motor.setVelCmd(self.velCmdRadPerS)
-            else:
-                self.motor.setVoltage(0.0)
-                self.velCmdRadPerS = 0
-                # todo we shouldn't get here.
+    def update(self):
+        if self.hasZeroed == "no":
+            self.hasZeroed = "enteringZeroing"
+        elif self.hasZeroed == "enteringZeroing":
+            self.motor.setVelCmd(-ZERO_OUT_RAD_PER_SEC)
+            self.hasZeroed = "zeroing"
+            self.count = 0
+            self.velCmdPercentage = 0
+        elif self.hasZeroed == "zeroing":
+            if self.motor.getMotorVelocityRadPerSec() > -ZERO_OUT_RAD_PER_SEC * 0.05:
+                if self.count >= 25:
+                    self.count = 0
+                    self.motor.setVoltage(0.0)
+                    self.hasZeroed = "yes"
+                else:
+                    self.count += 1
+        elif self.hasZeroed == "yes":
+            self.motor.setVelCmd(self.velCmdPercentage * MAX_CLIMB_SPEED_RAD_PER_SEC)
+        else:
+            # todo we shouldn't get here.
+            self.motor.setVoltage(0.0)
+            self.velCmdPercentage = 0
 
-        def setVelCmdRadPerS(self, velCmdRadPerS):
-          self.velCmdRadPerS = velCmdRadPerS
+    def setVelCmdPercentage(self, velCmdPercentage):
+        self.velCmdPercentage = velCmdPercentage
+
+    def resetHasZeroed(self):
+        self.hasZeroed = "no"
 
 
 class ClimberControl(metaclass=Singleton):
     def __init__(self):
-        # For initial tests, it might be easiest to set this to "yes"
-        # And use joysticks to ensure other factors are correct
-        # Then test out the zeroing
-        self.hasZeroed = "yes"  # xyzzy
-
         # TODO: this spark max can id should be moved to a constants file
-        self.motorLeft = ClimberMotorControl(name='left', inverted=False, )
-
-          WrapperedSparkMax(16, "_climberLeft", brakeMode=True, curLimitA=5)
-        self.motorRight = WrapperedSparkMax(14, "_climberRight", brakeMode=True, curLimitA=5)
-        self.motorLeft.setInverted(False)
-        self.motorRight.setInverted(False)
-        self.motorLeft.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
-        self.motorRight.setPID(kP=1.5e-4, kI=0.0, kD=0.0)
-
-        self.climbCmd = 0.0
+        self.motorLeft = ClimberMotorControl(name='left', inverted=False, canID=16)
+        self.motorRight = ClimberMotorControl(name='right', inverted=False, canID=14)
+        self.climbCmdPercentage = 0.0
 
     def update(self):
-        pass
+        self.motorLeft.setVelCmdPercentage(self.climbCmdPercentage)
+        self.motorRight.setVelCmdPercentage(self.climbCmdPercentage)
 
-    def setClimbCmd(self, cmd):
-        self.climbCmd = cmd
+    def setClimbCmdPercentage(self, cmd):
+        self.climbCmdPercentage = cmd
 
     def resetHasZeroed(self):
-        self.hasZeroed = "no"
+        self.motorLeft.resetHasZeroed()
+        self.motorRight.resetHasZeroed()
