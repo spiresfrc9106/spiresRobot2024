@@ -16,7 +16,7 @@ class OperatorInterface:
         self.startShooter = False
         self.cancelNoteHandling = False
 
-        self.climbCmd = 0.0 # Percentage of max climb speed
+        self.climberCmd = 0.0 # Percentage of max climb speed
         self.climbResetCmd = False # Re-zero climbing mechanism
 
     def update(self):
@@ -28,7 +28,7 @@ class OperatorInterface:
             self.cancelNoteHandling = self.ctrl.getBButtonPressed()
 
             leftJoyRaw = -1.0 * self.ctrl.getLeftY()
-            self.climbCmd = applyDeadband(leftJoyRaw, 0.1)
+            self.climberCmd = applyDeadband(leftJoyRaw, 0.1)
 
             self.climbResetCmd = self.ctrl.getXButtonPressed()
 

@@ -4,6 +4,7 @@ from utils.units import in2m
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from debugMaster.debug import Debug
 
+# pylint: disable=R0915
 
 class Constants:
     USE_AFF = True
@@ -142,7 +143,11 @@ class NoteHandler(metaclass=Singleton):
         return self.manualShooterVelFactor * maxVelocityRps
 
     def logMotorValues(self):
-        motors = [self.intake.motor1, self.transfer.motor1, self.transfer.motor2, self.shooter.motor1, self.shooter.motor2]
+        motors = [self.intake.motor1,
+                  self.transfer.motor1,
+                  self.transfer.motor2,
+                  self.shooter.motor1,
+                  self.shooter.motor2]
         for motor in motors:
             motor.getVelRPS()
             motor.getAppliedOutput()

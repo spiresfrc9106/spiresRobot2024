@@ -20,10 +20,10 @@ class CollectedTimeRec():
 class WindowedStats():
 
     def __init__(self, pointsToKeep=100):
-        self.q = collections.deque(maxlen=pointsToKeep)
+        self.queue = collections.deque(maxlen=pointsToKeep)
 
     def append(self, item:CollectedTimeRec):
-        self.q.append(item)
+        self.queue.append(item)
 
     def smoothWallTimeS(self):
         return statistics.mean(self.getWallTimes())
@@ -32,10 +32,10 @@ class WindowedStats():
         return statistics.mean(self.getCpuTimes())
 
     def getWallTimes(self):
-        return (x.durationS for x in self.q)
+        return (x.durationS for x in self.queue)
 
     def getCpuTimes(self):
-        return (x.cpuS for x in self.q)
+        return (x.cpuS for x in self.queue)
 
 class GeometricMean():
 
