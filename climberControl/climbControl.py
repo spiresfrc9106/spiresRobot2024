@@ -4,13 +4,11 @@ from utils.singleton import Singleton
 from utils.units import RPM2RadPerSec
 
 CLIMB_REVS_PER_INCH = 18.92 / 7.84
-# This is some back of the napkin math to ensure
-# that it takes no more than 1.5s to zero out.
-# I have low confidence that it is correct :/
 
 # rate * time = distance
 # rate = distance / time
 # vel_in_per_s = 12 in / 1.5 s
+# 1.5s was chosen arbitrarily, could be adjusted
 
 ZERO_OUT_VEL_INCH_PER_S = 12 / 1.5
 
