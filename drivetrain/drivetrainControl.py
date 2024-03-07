@@ -1,4 +1,4 @@
-from wpimath.kinematics import ChassisSpeeds
+from wpimath.kinematics import ChassisSpeeds, SwerveModuleState
 from wpimath.geometry import Pose2d, Rotation2d
 
 from utils.singleton import Singleton
@@ -96,9 +96,17 @@ class DrivetrainControl(metaclass=Singleton):
         Main periodic update, should be called every 20ms
         """
 
+        if abs(self.desChSpd.vx) < 0.01 and abs(self.desChSpd.vy) < 0.01 and abs(self.desChSpd.omega) < 0.01:
+            # When we're not moving, "toe in" the wheels to resist getting pushed around
+            flModState = SwerveModuleState(angle=Rotation2d.fromDegrees(45), speed=0)
+            frModState = SwerveModuleState(angle=Rotation2d.fromDegrees(-45), speed=0)
+            blModState = SwerveModuleState(angle=Rotation2d.fromDegrees(45), speed=0)
+            brModState = SwerveModuleState(angle=Rotation2d.fromDegrees(-45), speed=0)
+            desModStates = (flModState, frModState, blModState, brModState)
+        else:
+            # Given the current desired chassis speeds, convert to module states
+            desModStates = kinematics.toSwerveModuleStates(self.desChSpd)
 
-        # Given the current desired chassis speeds, convert to module states
-        desModStates = kinematics.toSwerveModuleStates(self.desChSpd)
         self.stt.perhapsMark(self.markDesModStatesName)
 
         # Scale back commands if one corner of the robot is going too fast
