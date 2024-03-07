@@ -81,7 +81,8 @@ def dtMotorRotToLinear(rot):
 
 # Drivetrain Performance Mechanical limits
 # Nominal calculations (ideal)
-MAX_DT_MOTOR_SPEED_RPS = DCMotor.NEO(1).freeSpeed
+#MAX_DT_MOTOR_SPEED_RPS = DCMotor.NEO(1).freeSpeed
+MAX_DT_MOTOR_SPEED_RPS = DCMotor.neoVortex(1).freeSpeed
 MAX_DT_LINEAR_SPEED = MAX_DT_MOTOR_SPEED_RPS / WHEEL_GEAR_RATIO * in2m(WHEEL_RADIUS_IN)
 # Fudged max expected performance
 MAX_FWD_REV_SPEED_MPS = MAX_DT_LINEAR_SPEED * 0.98  # fudge factor due to gearbox losses
@@ -91,8 +92,9 @@ MAX_ROTATE_SPEED_RAD_PER_SEC = deg2Rad(
 )  # Fixed at the maximum rotational speed we'd want.
 # Accelerations - also a total guess
 MAX_TRANSLATE_ACCEL_MPS2 = (
-    MAX_FWD_REV_SPEED_MPS / 0.50
-)  # 0-full time of 0.5 second - this is a guestimate
+    #MAX_FWD_REV_SPEED_MPS / 0.50
+    MAX_FWD_REV_SPEED_MPS/ 0.10
+)  # 0-full time of 0.5 second - this is a guestimate xyzzy - investigate making this smaller
 MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = (
     MAX_ROTATE_SPEED_RAD_PER_SEC / 0.25
 )  # 0-full time of 0.25 second - this is a guestaimate

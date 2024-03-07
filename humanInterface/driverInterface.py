@@ -23,6 +23,9 @@ class DriverInterface:
             self.ctrl = SimXboxController(DRIVER_CTRL_IDX)
 
         self.fieldRelative = True
+        self.velXCmdRaw = 0
+        self.velYCmdRaw = 0
+        self.velTCmdRaw = 0
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
@@ -61,15 +64,15 @@ class DriverInterface:
             sprintMult = 1.0 if (self.ctrl.getLeftBumper()) else 0.5
 
             # Convert joystick fractions into physical units of velocity
-            velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * sprintMult
-            velYCmdRaw = vYJoy * MAX_STRAFE_SPEED_MPS * sprintMult
-            velTCmdRaw = vTJoy * MAX_ROTATE_SPEED_RAD_PER_SEC * sprintMult
+            self.velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * sprintMult
+            self.velYCmdRaw = vYJoy * MAX_STRAFE_SPEED_MPS * sprintMult
+            self.velTCmdRaw = vTJoy * MAX_ROTATE_SPEED_RAD_PER_SEC * sprintMult
 
             # Slew-rate limit the velocity units to not change faster than
             # the robot can physically accomplish
-            self.velXCmd = self.velXSlewRateLimiter.calculate(velXCmdRaw)
-            self.velYCmd = self.velYSlewRateLimiter.calculate(velYCmdRaw)
-            self.velTCmd = self.velTSlewRateLimiter.calculate(velTCmdRaw)
+            self.velXCmd = self.velXSlewRateLimiter.calculate(self.velXCmdRaw)
+            self.velYCmd = self.velYSlewRateLimiter.calculate(self.velYCmdRaw)
+            self.velTCmd = self.velTSlewRateLimiter.calculate(self.velTCmdRaw)
 
             # Adjust the commands if we're robot relative
             if onRed() or not self.fieldRelative:
@@ -82,6 +85,9 @@ class DriverInterface:
         else:
             # If the joystick is unplugged, pick safe-state commands and raise a fault
             self.fieldRelative = True
+            self.velXCmdRaw = 0
+            self.velYCmdRaw = 0
+            self.velTCmdRaw = 0
             self.velXCmd = 0.0
             self.velYCmd = 0.0
             self.velTCmd = 0.0
@@ -89,6 +95,10 @@ class DriverInterface:
             self.connectedFault.setFaulted()
 
         log("DI fieldR Cmd", self.fieldRelative, "bool")
+        log("DI MAX_FWD_REV_SPEED_MPS", MAX_FWD_REV_SPEED_MPS, "mps")
+        log("DI FwdRev Raw", self.velXCmdRaw, "mps")
+        log("DI Strafe Raw", self.velYCmdRaw, "mps")
+        log("DI Rotate Raw", rad2Deg(self.velTCmdRaw), "degPerSec")
         log("DI FwdRev Cmd", self.velXCmd, "mps")
         log("DI Strafe Cmd", self.velYCmd, "mps")
         log("DI Rotate Cmd", rad2Deg(self.velTCmd), "degPerSec")

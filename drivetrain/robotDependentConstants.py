@@ -38,7 +38,7 @@ class RobotDependentConstants:
                 "FR_OFFSET": 0,
                 "BL_OFFSET": 125.66+180,
                 "BR_OFFSET": 117.74-90+180,
-                "GYRO": "NAVX",
+                "GYRO": "ADIS16470_IMU",
             },
             '2024sim': {
                 #"MAX_SWERVE_WHEEL_GEAR_RATIO": 5.50, # Base Low
@@ -51,7 +51,7 @@ class RobotDependentConstants:
                 "FR_OFFSET": 0,
                 "BL_OFFSET": 0,
                 "BR_OFFSET": 0,
-                "GYRO": "NAVX",
+                "GYRO": "ADIS16470_IMU",
             }
         }
 

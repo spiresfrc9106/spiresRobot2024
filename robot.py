@@ -69,14 +69,15 @@ class MyRobot(wpilib.TimedRobot):
             runStyle=RUN_PERIODIC_LOOP,
             enableDiskUpdates=False
         )
+        self.count=0
 
-        print(f"before:0:{len(gc.get_objects(generation=0))}")
-        print(f"before:1:{len(gc.get_objects(generation=1))}")
-        print(f"before:2:{len(gc.get_objects(generation=2))}")
+        #print(f"before:0:{len(gc.get_objects(generation=0))}")
+        #print(f"before:1:{len(gc.get_objects(generation=1))}")
+        #print(f"before:2:{len(gc.get_objects(generation=2))}")
         gc.freeze()
-        print(f"after:0:{len(gc.get_objects(generation=0))}")
-        print(f"after:1:{len(gc.get_objects(generation=1))}")
-        print(f"after:2:{len(gc.get_objects(generation=2))}")
+        #print(f"after:0:{len(gc.get_objects(generation=0))}")
+        #print(f"after:1:{len(gc.get_objects(generation=1))}")
+        #print(f"after:2:{len(gc.get_objects(generation=2))}")
 
         # self.noteHandler = NoteHandler()
 
@@ -95,10 +96,12 @@ class MyRobot(wpilib.TimedRobot):
 
 
     def robotPeriodic(self):
-        gc.disable()
+        #gc.disable()
         self.stt.start()
 
         self.stt.perhapsMark(self.markStartCrashName)
+        if self.count == 10:
+            gc.freeze()
         self.crashLogger.update()
         self.stt.perhapsMark(self.markCrashName)
 
@@ -125,14 +128,14 @@ class MyRobot(wpilib.TimedRobot):
             self.rioMonitor.updateFromPerioidLoop()
         self.stt.mark("rioMonitor.updateFromPerioidLoop()_")
         # print(f"before:{gc.get_stats()}")
-        gc.enable()
+        #gc.enable()
         # gc.collect(generation=0)
         # self.stt.mark("gc.collect(0)______________________")
         # gc.collect(generation=1)
         # self.stt.mark("gc.collect(1)______________________")
         # gc.collect()
         self.stt.mark("gc.collect()_______________________")
-        gc.disable()
+        #gc.disable()
         # print(f"after:{gc.get_stats()}")
         # print(
         #    f"after:0:{len(gc.get_objects(generation=0)):5} "
@@ -140,6 +143,7 @@ class MyRobot(wpilib.TimedRobot):
         #    f"2:{len(gc.get_objects(generation=2)):5}"
         # )
 
+        self.count += 1
         self.stt.end()
 
     #########################################################

@@ -48,7 +48,7 @@ class SwerveModuleControl:
             invertWheel (bool): Inverts the steering direction of the wheel - needed if motor is mounted upside
         """
         self.wheelMotor = WrapperedSparkMax(
-            wheelMotorCanID, moduleName + "_wheel", False
+            wheelMotorCanID, moduleName + "_wheel", brakeMode=False,
         )
         self.azmthMotor = WrapperedSparkMax(
             azmthMotorCanID, moduleName + "_azmth", True
@@ -62,6 +62,7 @@ class SwerveModuleControl:
         self.azmthMotor.setInverted(invertAzmthMotor)
 
         self.wheelMotorFF = SimpleMotorFeedforwardMeters(0, 0, 0)
+        self.wheelMotorVoltageFF = 0
 
         self.desiredState = SwerveModuleState()
         self.optimizedDesiredState = SwerveModuleState()
@@ -110,6 +111,11 @@ class SwerveModuleControl:
             getSpeedActTopicName(self.moduleName),
             (self.actualState.speed) / MAX_FWD_REV_SPEED_MPS,
             "frac",
+        )
+        log(
+            f"Dt_{self.moduleName}_FF_V",
+            self.wheelMotorVoltageFF,
+            "V"
         )
 
         if self.rId.getSerialFaulted():
@@ -186,8 +192,8 @@ class SwerveModuleControl:
         
         motorDesSpd = dtLinearToMotorRot(self.optimizedDesiredState.speed)
         motorDesAccel = (motorDesSpd - self._prevMotorDesSpeed)/ 0.02
-        motorVoltageFF = self.wheelMotorFF.calculate(motorDesSpd, motorDesAccel)
-        self.wheelMotor.setVelCmd(motorDesSpd, motorVoltageFF)
+        self.wheelMotorVoltageFF = self.wheelMotorFF.calculate(motorDesSpd, motorDesAccel)
+        self.wheelMotor.setVelCmd(motorDesSpd, self.wheelMotorVoltageFF)
         self.stt.perhapsMark(self.markWheelMotorSetVelCmdName)
         
         self._prevMotorDesSpeed = motorDesSpd # save for next loop
