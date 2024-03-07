@@ -3,9 +3,9 @@ import gc
 import wpilib
 from Autonomous.modes.driveOut import DriveOut
 from climberControl.climberControl import ClimberControl
-from humanInterface.operatorInterface import OperatorInterface
 from robotConfig import webserverConstructorOrNone
 from robotConfig import dashboardOrNone
+from humanInterface.operatorInterface import OperatorInterface
 from humanInterface.driverInterface import DriverInterface
 from humanInterface.ledControl import LEDControl
 from drivetrain.drivetrainControl import DrivetrainControl
