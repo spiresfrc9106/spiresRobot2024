@@ -95,7 +95,7 @@ class DriverInterface:
         log("DI FwdRev Cmd", self.velXCmd, "mps")
         log("DI Strafe Cmd", self.velYCmd, "mps")
         log("DI Rotate Cmd", rad2Deg(self.velTCmd), "degPerSec")
-        log("DI Heading Cmd", self.headingCmdDeg, "deg")
+        log("DI Heading Cmd", self.headingCmdDeg if self.headingCmdDeg else -1, "deg")
         log("DI connected", self.ctrl.isConnected(), "bool")
 
     def getVxCmd(self):
