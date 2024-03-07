@@ -26,6 +26,7 @@ class DriverInterface:
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
+        self.headingCmdDeg = None
         self.gyroResetCmd = False
         self.connectedFault = Fault(f"Driver XBox Controller ({DRIVER_CTRL_IDX}) Unplugged")
 
@@ -34,8 +35,6 @@ class DriverInterface:
         self.velTSlewRateLimiter = SlewRateLimiter(
             rateLimit=MAX_ROTATE_ACCEL_RAD_PER_SEC_2
         )
-
-
 
     def update(self):
         """Main update - call this once every 20ms"""
@@ -50,6 +49,9 @@ class DriverInterface:
             vXJoyRaw = -1.0 * self.ctrl.getLeftY()
             vYJoyRaw = -1.0 * self.ctrl.getLeftX()
             vTJoyRaw =  -1.0 * self.ctrl.getRightX()
+
+            dpadRaw = self.ctrl.getPOV() # up: 0, right: 90, down: 180, left: 270, unpressed: -1
+            self.headingCmdDeg = 360 - dpadRaw if dpadRaw != -1 else None # up: 0, right: 270, down: 180, left: 90, unpressed: None
 
             # Apply deadband to make sure letting go of the joystick actually stops the bot
             vXJoy = applyDeadband(vXJoyRaw, 0.15)
@@ -85,6 +87,7 @@ class DriverInterface:
             self.velXCmd = 0.0
             self.velYCmd = 0.0
             self.velTCmd = 0.0
+            self.headingCmdDeg = None
             self.gyroResetCmd = False
             self.connectedFault.setFaulted()
 
@@ -92,6 +95,7 @@ class DriverInterface:
         log("DI FwdRev Cmd", self.velXCmd, "mps")
         log("DI Strafe Cmd", self.velYCmd, "mps")
         log("DI Rotate Cmd", rad2Deg(self.velTCmd), "degPerSec")
+        log("DI Heading Cmd", self.headingCmdDeg, "deg")
         log("DI connected", self.ctrl.isConnected(), "bool")
 
     def getVxCmd(self):
@@ -114,6 +118,13 @@ class DriverInterface:
             float: Driver's current vT (rotation) command in radians per second
         """
         return self.velTCmd
+
+    def getHeadingCmd(self):
+        """
+        Returns:
+            int | None: Desired heading command in degrees or None to use vTCmd instead
+        """
+        return self.headingCmdDeg
 
     def getGyroResetCmd(self):
         """_summary_

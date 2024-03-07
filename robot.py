@@ -1,6 +1,8 @@
+from math import pi
 import sys
 import gc
 import wpilib
+from wpimath import angleModulus
 from Autonomous.modes.driveOut import DriveOut
 from climberControl.climberControl import ClimberControl
 from robotConfig import webserverConstructorOrNone
@@ -171,10 +173,21 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
 
-        if self.dInt.fieldRelative:
-            self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
+        headingCmd = self.dInt.getHeadingCmd()
+        vxCmd = self.dInt.getVxCmd()
+        vyCmd = self.dInt.getVyCmd()
+        vtCmd = self.dInt.getVtCmd()
+
+        if headingCmd != None:
+            if self.dInt.fieldRelative:
+                self.driveTrain.setCmdFieldRelativeHeading(vxCmd, vyCmd, headingCmd)
+            else:
+                self.driveTrain.setCmdRobotRelativeHeading(vxCmd, vyCmd, headingCmd)
         else:
-            self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
+            if self.dInt.fieldRelative:
+                self.driveTrain.setCmdFieldRelative(vxCmd, vyCmd, vtCmd)
+            else:
+                self.driveTrain.setCmdRobotRelative(vxCmd, vyCmd, vtCmd)
 
         if self.opInt.getClimberCmd():
             self.climberControl.setClimberSpeed(1) # TODO: determine an appropriate climb speed

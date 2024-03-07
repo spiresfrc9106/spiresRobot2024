@@ -70,6 +70,23 @@ class DrivetrainControl(metaclass=Singleton):
         self.desChSpd = ChassisSpeeds.discretize(tmp.vx, tmp.vy, tmp.omega, 0.02)
         self.poseEst.telemetry.setDesiredPose(self.poseEst.getCurEstPose())
 
+    def setCmdFieldRelativeHeading(self, velX, velY, headingDeg):
+        """Send commands to the robot for motion relative to the field with a specific heading
+        
+        Args:
+            velX (float): Desired speed in the field's X direction, in meters per second
+            velY (float): Desired speed in the field's Y axis, in th meters per second
+            headingDeg: (int): Desired heading in degrees
+        """
+        rotation = Rotation2d.fromDegrees(headingDeg)
+        tmp = self.trajCtrl.update(rotation, self.poseEst.getCurEstPose()) # Do not use other velocities from this result
+        xyFieldRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            velX, velY, tmp.omega, self.poseEst.getCurEstPose().rotation()
+        )
+        self.desChSpd = ChassisSpeeds.discretize(xyFieldRelativeSpeeds.vx, xyFieldRelativeSpeeds.vy, tmp.omega, 0.02)
+        curPose = self.poseEst.getCurEstPose()
+        self.poseEst.telemetry.setDesiredPose(Pose2d(curPose.x, curPose.y, rotation))
+
     def setCmdRobotRelative(self, velX, velY, velT):
         """Send commands to the robot for motion relative to its own reference frame
 
@@ -80,6 +97,20 @@ class DrivetrainControl(metaclass=Singleton):
         """
         self.desChSpd = ChassisSpeeds.discretize(velX, velY, velT, 0.02)
         self.poseEst.telemetry.setDesiredPose(self.poseEst.getCurEstPose())
+
+    def setCmdRobotRelativeHeading(self, velX, velY, headingDeg):
+        """Send commands to the robot for motion relative to its own reference frame with a specific heading
+
+        Args:
+            velX (float): Desired speed in the robot's X direction, in meters per second
+            velY (float): Desired speed in the robot's Y axis, in th meters per second
+            headingDeg: (int): Desired heading in degrees
+        """
+        rotation = Rotation2d.fromDegrees(headingDeg)
+        tmp = self.trajCtrl.update(rotation, self.poseEst.getCurEstPose()) # Do not use other velocities from this result
+        self.desChSpd = ChassisSpeeds.discretize(velX, velY, tmp.omega, 0.02)
+        curPose = self.poseEst.getCurEstPose()
+        self.poseEst.telemetry.setDesiredPose(Pose2d(curPose.x, curPose.y, rotation))
 
     def setCmdTrajectory(self, cmd):
         """Send commands to the robot for motion as a part of following a trajectory
