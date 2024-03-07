@@ -174,11 +174,8 @@ class MyRobot(wpilib.TimedRobot):
         vyCmd = self.dInt.getVyCmd()
         vtCmd = self.dInt.getVtCmd()
 
-        if headingCmd != None:
-            if self.dInt.fieldRelative:
-                self.driveTrain.setCmdFieldRelativeHeading(vxCmd, vyCmd, headingCmd)
-            else:
-                self.driveTrain.setCmdRobotRelativeHeading(vxCmd, vyCmd, headingCmd)
+        if headingCmd is not None and self.dInt.fieldRelative:
+            self.driveTrain.setCmdFieldRelativeHeading(vxCmd, vyCmd, headingCmd)
         else:
             if self.dInt.fieldRelative:
                 self.driveTrain.setCmdFieldRelative(vxCmd, vyCmd, vtCmd)
