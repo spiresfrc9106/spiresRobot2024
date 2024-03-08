@@ -140,5 +140,5 @@ class WrapperedSparkMax:
         log(self.name + "_estOutputV", output, "V")
         return output
 
-    def setSmartCurrentLimit(self):
-        pass
+    def setSmartCurrentLimit(self, curLimitA: int):
+        self.ctrl.setSmartCurrentLimit(curLimitA)

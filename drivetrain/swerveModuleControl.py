@@ -6,6 +6,7 @@ from wpimath.kinematics import SwerveModuleState
 from wpimath.kinematics import SwerveModulePosition
 from wpimath.geometry import Rotation2d
 import wpilib
+from utils.calibration import Calibration
 
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from dashboardWidgets.swerveState import getAzmthDesTopicName, getAzmthActTopicName
@@ -47,9 +48,9 @@ class SwerveModuleControl:
             invertWheel (bool): Inverts the drive direction of the wheel - needed since left/right sides are mirrored
             invertWheel (bool): Inverts the steering direction of the wheel - needed if motor is mounted upside
         """
+        self.wheelCurLimitACal = Calibration(f'SwerveModule {moduleName} Current Limit', 25, "Amps", 0)
         self.wheelMotor = WrapperedSparkMax(
-            wheelMotorCanID, moduleName + "_wheel", brakeMode=False,
-        )
+            wheelMotorCanID, moduleName + "_wheel", brakeMode=False, curLimitA=int(self.wheelCurLimitACal.get()))
         self.azmthMotor = WrapperedSparkMax(
             azmthMotorCanID, moduleName + "_azmth", True
         )
@@ -170,6 +171,8 @@ class SwerveModuleControl:
 
     def update(self):
         """Main update function, call every 20ms"""
+        if self.wheelCurLimitACal.isChanged():
+            self.wheelMotor.setSmartCurrentLimit(int(self.wheelCurLimitACal.get()))
 
         # Read from the azimuth angle sensor (encoder)
         self.azmthEnc.update()
