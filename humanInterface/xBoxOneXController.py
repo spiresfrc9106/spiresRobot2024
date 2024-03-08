@@ -27,10 +27,10 @@ class XboxOneXController(GenericHID):
         self.dbg = Debug()
 
     def getLeftY(self):
-        return super().getRawAxis(self.kLeftY)
+        return super().getRawAxis(self.kLeftY) * -1.0
 
     def getLeftX(self):
-        return super().getRawAxis(self.kLeftX)
+        return super().getRawAxis(self.kLeftX) * -1.0
 
     def getRightY(self):
         return super().getRawAxis(self.kRightY)
