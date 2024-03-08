@@ -64,9 +64,11 @@ class DriverInterface:
             sprintMult = 1.0 if (self.ctrl.getLeftBumper()) else 0.5
 
             # Convert joystick fractions into physical units of velocity
+            # Nathan requested that sprint mode not apply to rotation
+            # He requested that rotation to be faster than half-speed but not quite sprint speeds
             self.velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * sprintMult
             self.velYCmdRaw = vYJoy * MAX_STRAFE_SPEED_MPS * sprintMult
-            self.velTCmdRaw = vTJoy * MAX_ROTATE_SPEED_RAD_PER_SEC * sprintMult
+            self.velTCmdRaw = vTJoy * MAX_ROTATE_SPEED_RAD_PER_SEC * 0.75
 
             # Slew-rate limit the velocity units to not change faster than
             # the robot can physically accomplish
