@@ -25,6 +25,7 @@ class DriverInterface:
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
+        self.headingDegCmd = None
         self.gyroResetCmd = False
         self.connectedFault = Fault(f"Driver XBox Controller ({DRIVER_CTRL_IDX}) Unplugged")
 
@@ -56,6 +57,8 @@ class DriverInterface:
             vYJoy = applyDeadband(vYJoyRaw, 0.15)
             vTJoy = applyDeadband(vTJoyRaw, 0.15)
 
+            povRaw = self.ctrl.getPOV()
+            self.headingDegCmd = 360 - povRaw if povRaw != -1 else None
 
             # Robot goes half speed by default
             # Press and hold Left Bumper to unlock full speed sprint
@@ -131,6 +134,9 @@ class DriverInterface:
             float: Driver's current vT (rotation) command in radians per second
         """
         return self.velTCmd
+
+    def getHeadingDegCmd(self):
+        return self.headingDegCmd
 
     def getGyroResetCmd(self):
         """_summary_
