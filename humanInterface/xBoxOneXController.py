@@ -3,7 +3,7 @@ from wpilib.interfaces import GenericHID
 
 from debugMaster.debug import Debug
 
-class SimXboxController(GenericHID):
+class XboxOneXController(GenericHID):
     '''
     This class is just a button and stick index remapping
     WPILib does not guarantee that controls will behave the same in sim

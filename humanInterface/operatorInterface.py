@@ -1,6 +1,4 @@
-from wpilib import RobotBase, XboxController
-from wpimath import applyDeadband
-from humanInterface.simXboxController import SimXboxController
+from wpilib import XboxController
 from utils.faults import Fault
 from . import OPERATOR_CTRL_IDX
 
@@ -8,10 +6,7 @@ class OperatorInterface:
     """Class to gather input from the operator of the robot"""
 
     def __init__(self):
-        if not RobotBase.isSimulation():
-            self.ctrl = XboxController(OPERATOR_CTRL_IDX)
-        else:
-            self.ctrl = SimXboxController(OPERATOR_CTRL_IDX)
+        self.ctrl = XboxController(OPERATOR_CTRL_IDX)
 
         self.connectedFault = Fault(f"Operator XBox Controller ({OPERATOR_CTRL_IDX}) Unplugged")
 

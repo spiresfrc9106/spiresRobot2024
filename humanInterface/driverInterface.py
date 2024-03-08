@@ -1,4 +1,4 @@
-from wpilib import XboxController, RobotBase
+from wpilib import XboxController
 from wpimath import applyDeadband
 from wpimath.filter import SlewRateLimiter
 from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS
@@ -6,7 +6,6 @@ from drivetrain.drivetrainPhysical import MAX_STRAFE_SPEED_MPS
 from drivetrain.drivetrainPhysical import MAX_ROTATE_SPEED_RAD_PER_SEC
 from drivetrain.drivetrainPhysical import MAX_ROTATE_ACCEL_RAD_PER_SEC_2
 from drivetrain.drivetrainPhysical import MAX_TRANSLATE_ACCEL_MPS2
-from humanInterface.simXboxController import SimXboxController
 from utils.faults import Fault
 from utils.signalLogging import log
 from utils.allianceTransformUtils import onRed
@@ -17,10 +16,7 @@ class DriverInterface:
     """Class to gather input from the driver of the robot"""
 
     def __init__(self):
-        if not RobotBase.isSimulation():
-            self.ctrl = XboxController(DRIVER_CTRL_IDX)
-        else:
-            self.ctrl = SimXboxController(DRIVER_CTRL_IDX)
+        self.ctrl = XboxController(DRIVER_CTRL_IDX)
 
         self.fieldRelative = True
         self.velXCmdRaw = 0
