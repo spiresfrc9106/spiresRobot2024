@@ -172,6 +172,7 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
 
+        self.driveTrain.setCoastCmd(self.dInt.coastCmd)
         if self.dInt.fieldRelative:
             self.driveTrain.setCmdFieldRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd(), self.dInt.getHeadingDegCmd())
         else:

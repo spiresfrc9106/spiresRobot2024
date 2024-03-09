@@ -26,6 +26,7 @@ class DriverInterface:
         self.velYCmd = 0
         self.velTCmd = 0
         self.headingDegCmd = None
+        self.coastCmd = False
         self.gyroResetCmd = False
         self.connectedFault = Fault(f"Driver XBox Controller ({DRIVER_CTRL_IDX}) Unplugged")
 
@@ -88,6 +89,7 @@ class DriverInterface:
                 self.velXCmd *= -1
                 self.velYCmd *= -1
 
+            self.coastCmd = self.ctrl.getXButton()
             self.gyroResetCmd = self.ctrl.getAButtonPressed()
 
             self.connectedFault.setNoFault()
@@ -100,6 +102,7 @@ class DriverInterface:
             self.velXCmd = 0.0
             self.velYCmd = 0.0
             self.velTCmd = 0.0
+            self.coastCmd = False
             self.gyroResetCmd = False
             self.ctrl.resetControllerMapping()
             self.connectedFault.setFaulted()
@@ -112,6 +115,7 @@ class DriverInterface:
         log("DI FwdRev Cmd", self.velXCmd, "mps")
         log("DI Strafe Cmd", self.velYCmd, "mps")
         log("DI Rotate Cmd", rad2Deg(self.velTCmd), "degPerSec")
+        log("DI Coast Cmd", self.coastCmd, "bool")
         log("DI connected", self.ctrl.isConnected(), "bool")
 
     def getVxCmd(self):

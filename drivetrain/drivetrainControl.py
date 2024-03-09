@@ -40,6 +40,7 @@ class DrivetrainControl(metaclass=Singleton):
         self.markSendToModulesName         = self.stt.makePaddedMarkName("SendCommandsToModuleAndUpdate")
         self.markPoseEstUpdateName         = self.stt.makePaddedMarkName("poseEst.update")
         self.markGainsHasChangedName       = self.stt.makePaddedMarkName("gains.hasChanged")
+
         self.modules = []
         self.modules.append(SwerveModuleControl("FL", 2, 3, 0,
             FL_ENCODER_MOUNT_OFFSET_RAD, FL_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
@@ -49,6 +50,9 @@ class DrivetrainControl(metaclass=Singleton):
             BL_ENCODER_MOUNT_OFFSET_RAD, BL_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
         self.modules.append(SwerveModuleControl("BR", 8, 9, 3,
             BR_ENCODER_MOUNT_OFFSET_RAD, BR_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
+
+        self.coastCmd = False
+
         self.desChSpd = ChassisSpeeds()
         self.curDesPose = Pose2d()
 
@@ -111,12 +115,18 @@ class DrivetrainControl(metaclass=Singleton):
         self.desChSpd = ChassisSpeeds.discretize(tmp.vx, tmp.vy, tmp.omega, 0.02)
         self.poseEst.telemetry.setDesiredPose(cmd.getPose())
 
+    def setCoastCmd(self, coast):
+        self.coastCmd = coast
+
     def update(self):
         """
         Main periodic update, should be called every 20ms
         """
 
-        if abs(self.desChSpd.vx) < 0.01 and abs(self.desChSpd.vy) < 0.01 and abs(self.desChSpd.omega) < 0.01:
+        if (abs(self.desChSpd.vx) < 0.01 and
+            abs(self.desChSpd.vy) < 0.01 and
+            abs(self.desChSpd.omega) < 0.01 and
+            not self.coastCmd):
             # When we're not moving, "toe in" the wheels to resist getting pushed around
             flModState = SwerveModuleState(angle=Rotation2d.fromDegrees(45), speed=0)
             frModState = SwerveModuleState(angle=Rotation2d.fromDegrees(-45), speed=0)
