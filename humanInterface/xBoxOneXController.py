@@ -41,6 +41,8 @@ class XboxOneXController(GenericHID):
     def getAButtonPressed(self):
         return super().getRawButtonPressed(self.kA)
 
+    def getBButton(self):
+        return super().getRawButton(self.kB)
     def getBButtonPressed(self):
         return super().getRawButtonPressed(self.kB)
 

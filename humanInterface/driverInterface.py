@@ -25,6 +25,7 @@ class DriverInterface:
         self.velXCmd = 0
         self.velYCmd = 0
         self.velTCmd = 0
+        self.brakeCmd = False
         self.gyroResetCmd = False
         self.connectedFault = Fault(f"Driver XBox Controller ({DRIVER_CTRL_IDX}) Unplugged")
 
@@ -33,7 +34,6 @@ class DriverInterface:
         self.velTSlewRateLimiter = SlewRateLimiter(
             rateLimit=MAX_ROTATE_ACCEL_RAD_PER_SEC_2
         )
-
 
 
     def update(self):
@@ -77,6 +77,7 @@ class DriverInterface:
                 self.velXCmd *= -1
                 self.velYCmd *= -1
 
+            self.brakeCmd = self.ctrl.getBButton()
             self.gyroResetCmd = self.ctrl.getAButtonPressed()
 
             self.connectedFault.setNoFault()
@@ -89,6 +90,7 @@ class DriverInterface:
             self.velXCmd = 0.0
             self.velYCmd = 0.0
             self.velTCmd = 0.0
+            self.brakeCmd = False
             self.gyroResetCmd = False
             self.connectedFault.setFaulted()
 
@@ -100,6 +102,7 @@ class DriverInterface:
         log("DI FwdRev Cmd", self.velXCmd, "mps")
         log("DI Strafe Cmd", self.velYCmd, "mps")
         log("DI Rotate Cmd", rad2Deg(self.velTCmd), "degPerSec")
+        log("DI Brake Cmd", self.brakeCmd, "bool")
         log("DI connected", self.ctrl.isConnected(), "bool")
 
     def getVxCmd(self):
@@ -122,6 +125,9 @@ class DriverInterface:
             float: Driver's current vT (rotation) command in radians per second
         """
         return self.velTCmd
+
+    def getBrakeCmd(self):
+        return self.brakeCmd
 
     def getGyroResetCmd(self):
         """_summary_
