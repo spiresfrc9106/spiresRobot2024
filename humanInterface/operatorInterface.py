@@ -1,5 +1,7 @@
 from wpilib import XboxController
+from wpimath import applyDeadband
 from utils.faults import Fault
+from utils.signalLogging import log
 from . import OPERATOR_CTRL_IDX
 
 class OperatorInterface:
@@ -14,7 +16,8 @@ class OperatorInterface:
         self.startShooter = False
         self.cancelNoteHandling = False
 
-        self.climberCmd = False
+        self.climberCmd = 0.0 # Percentage of max climb speed
+        self.climbResetCmd = False # Re-zero climbing mechanism
 
     def update(self):
         """Main update - call this once every 20ms"""
@@ -24,7 +27,10 @@ class OperatorInterface:
             self.startShooter = self.ctrl.getAButtonPressed()
             self.cancelNoteHandling = self.ctrl.getBButtonPressed()
 
-            self.climberCmd = self.ctrl.getRightBumper()
+            leftJoyRaw = -1.0 * self.ctrl.getLeftY()
+            self.climberCmd = applyDeadband(leftJoyRaw, 0.1)
+
+            self.climbResetCmd = self.ctrl.getXButtonPressed()
 
             self.connectedFault.setNoFault()
         else:
@@ -32,9 +38,12 @@ class OperatorInterface:
             self.startShooter = False
             self.cancelNoteHandling = False
 
-            self.climberCmd = False
+            self.climberCmd = 0.0
+            self.climbResetCmd = False
 
             self.connectedFault.setFaulted()
+
+        log("OI climberCmd", self.climberCmd, "pct")
 
     def getStartIntakeCmd(self):
         return self.startIntake
@@ -43,5 +52,5 @@ class OperatorInterface:
     def getCancelNoteHandlingCmd(self):
         return self.cancelNoteHandling
 
-    def getClimberCmd(self):
+    def getClimberCmdPercentage(self):
         return self.climberCmd

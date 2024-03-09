@@ -8,6 +8,7 @@ from robotConfig import dashboardOrNone
 from humanInterface.operatorInterface import OperatorInterface
 from humanInterface.driverInterface import DriverInterface
 from humanInterface.ledControl import LEDControl
+
 from drivetrain.drivetrainControl import DrivetrainControl
 from utils.segmentTimeTracker import SegmentTimeTracker
 from utils.signalLogging import SignalWrangler
@@ -178,10 +179,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
-        if self.opInt.getClimberCmd():
-            self.climberControl.setClimberSpeed(1) # TODO: determine an appropriate climb speed
-        else:
-            self.climberControl.setClimberSpeed(0)
+        self.climberControl.setClimbCmdPercentage(self.opInt.getClimberCmdPercentage())
 
 
         # self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()

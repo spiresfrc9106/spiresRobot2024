@@ -152,7 +152,7 @@ class NoteHandler(metaclass=Singleton):
             motor.getAppliedOutput()
 
     def update(self):
-        # pylint: disable=R0915
+        # pylint: disable= too-many-statements
         self.logMotorValues()
 
         if self.manualNoteHandlerControls:
