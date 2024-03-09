@@ -80,8 +80,8 @@ class ClimberMotorControl():
 class ClimberControl(metaclass=Singleton):
     def __init__(self):
         # TODO: this spark max can id should be moved to a constants file
-        self.motorLeft = ClimberMotorControl(name='left', inverted=False, canID=16)
-        self.motorRight = ClimberMotorControl(name='right', inverted=False, canID=14)
+        self.motorLeft = ClimberMotorControl(name='left', inverted=True, canID=16)
+        self.motorRight = ClimberMotorControl(name='right', inverted=True, canID=14)
         self.climbCmdPercentage = 0.0
 
     def update(self):
