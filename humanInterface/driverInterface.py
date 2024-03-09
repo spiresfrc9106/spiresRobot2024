@@ -38,6 +38,7 @@ class DriverInterface:
 
     def update(self):
         """Main update - call this once every 20ms"""
+        self.ctrl.update()
 
         if self.ctrl.isConnected():
             # Only attempt to read from the joystick if it's plugged in
@@ -90,6 +91,7 @@ class DriverInterface:
             self.velYCmd = 0.0
             self.velTCmd = 0.0
             self.gyroResetCmd = False
+            self.ctrl.resetControllerMapping()
             self.connectedFault.setFaulted()
 
         log("DI fieldR Cmd", self.fieldRelative, "bool")

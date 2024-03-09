@@ -48,6 +48,14 @@ class MyRobot(wpilib.TimedRobot):
         self.markFautWranglerName = self.stt.makePaddedMarkName("FaultWrangler().update()")
         self.webserver = webserverConstructorOrNone()
 
+        self.dbg = Debug()
+        self.dbg.toPrint.update({'velState': False})
+        self.dbg.toPrint.update({'sparkUpdates': False})
+        self.dbg.toPrint.update({'hi': False})
+        self.dbg.toPrint.update({'test': True})
+        self.dbg.toPrint.update({'note': False})  # True
+        self.dbg.toPrint.update({'error': False})  # True
+
         self.driveTrain = DrivetrainControl()
         self.climberControl = ClimberControl()
 
@@ -80,14 +88,6 @@ class MyRobot(wpilib.TimedRobot):
         #print(f"after:2:{len(gc.get_objects(generation=2))}")
 
         # self.noteHandler = NoteHandler()
-
-        self.dbg = Debug()
-        self.dbg.toPrint.update({'velState': False})
-        self.dbg.toPrint.update({'sparkUpdates': False})
-        self.dbg.toPrint.update({'hi': False})
-        self.dbg.toPrint.update({'test': False})
-        self.dbg.toPrint.update({'note': False})  # True
-        self.dbg.toPrint.update({'error': False})  # True
 
         # Uncomment this and simulate to update the code
         # dependencies graph

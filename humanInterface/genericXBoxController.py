@@ -1,6 +1,8 @@
 import typing
 from wpilib.interfaces import GenericHID
 
+from debugMaster.debug import Debug
+
 
 class GenericXboxController(GenericHID):
     '''
@@ -45,66 +47,82 @@ class GenericXboxController(GenericHID):
 
     def __init__(self, port: int):
         super().__init__(port)
+        self.dbg = Debug()
+        self.mapping = None
         self.setControllerMapping()
 
+    def update(self):
+        if self.mapping is None:
+            self.setControllerMapping()
+
     def setControllerMapping(self):
+        self.dbg.print('test', f'Connected {super().isConnected()}')
         if super().isConnected():
+            self.dbg.print("test", f'Type {super().getType()}')
+            self.dbg.print("test", f'Name {super().getName()}')
             if (super().getType() == GenericHID.HIDType.kHIDJoystick and
                 super().getName() == "Xbox Wireless Controller"):
                 self.mapping = self.XboxOneXMapping()
             else:
                 self.mapping = self.XBox360Mapping()
+
+    def getControllerMapping(self):
+        if self.mapping is not None:
+            return self.mapping
         else:
-            self.mapping = self.XBox360Mapping()
+            return self.XBox360Mapping()
+
+    def resetControllerMapping(self):
+        self.mapping = None
     
     def getAButton(self):
-        return super().getRawButton(self.mapping.kA)
+        return super().getRawButton(self.getControllerMapping().kA)
     def getAButtonPressed(self):
-        return super().getRawButtonPressed(self.mapping.kA)
+        return super().getRawButtonPressed(self.getControllerMapping().kA)
     def getAButtonReleased(self):
-        return super().getRawButtonReleased(self.mapping.kA)
+        return super().getRawButtonReleased(self.getControllerMapping().kA)
 
     def getBButton(self):
-        return super().getRawButton(self.mapping.kB)
+        return super().getRawButton(self.getControllerMapping().kB)
     def getBButtonPressed(self):
-        return super().getRawButtonPressed(self.mapping.kB)
+        return super().getRawButtonPressed(self.getControllerMapping().kB)
     def getBButtonReleased(self):
-        return super().getRawButtonReleased(self.mapping.kB)
+        return super().getRawButtonReleased(self.getControllerMapping().kB)
 
     def getXButton(self):
-        return super().getRawButton(self.mapping.kX)
+        return super().getRawButton(self.getControllerMapping().kX)
     def getXButtonPressed(self):
-        return super().getRawButtonPressed(self.mapping.kX)
+        return super().getRawButtonPressed(self.getControllerMapping().kX)
     def getXButtonReleased(self):
-        return super().getRawButtonReleased(self.mapping.kX)
+        return super().getRawButtonReleased(self.getControllerMapping().kX)
 
     def getYButton(self):
-        return super().getRawButton(self.mapping.kY)
+        return super().getRawButton(self.getControllerMapping().kY)
     def getYButtonPressed(self):
-        return super().getRawButtonPressed(self.mapping.kY)
+        return super().getRawButtonPressed(self.getControllerMapping().kY)
     def getYButtonReleased(self):
-        return super().getRawButtonReleased(self.mapping.kY)
+        return super().getRawButtonReleased(self.getControllerMapping().kY)
 
     def getLeftBumper(self):
-        return super().getRawButton(self.mapping.kLeftBumper)
+        return super().getRawButton(self.getControllerMapping().kLeftBumper)
     def getLeftBumperPressed(self):
-        return super().getRawButtonPressed(self.mapping.kLeftBumper)
+        return super().getRawButtonPressed(self.getControllerMapping().kLeftBumper)
     def getLeftBumperReleased(self):
-        return super().getRawButtonReleased(self.mapping.kLeftBumper)
+        return super().getRawButtonReleased(self.getControllerMapping().kLeftBumper)
 
     def getRightBumper(self):
-        return super().getRawButton(self.mapping.kRightBumper)
+        return super().getRawButton(self.getControllerMapping().kRightBumper)
     def getRightBumperPressed(self):
-        return super().getRawButtonPressed(self.mapping.kRightBumper)
+        return super().getRawButtonPressed(self.getControllerMapping().kRightBumper)
     def getRightBumperReleased(self):
-        return super().getRawButtonReleased(self.mapping.kRightBumper)
+        return super().getRawButtonReleased(self.getControllerMapping().kRightBumper)
 
     def getLeftX(self):
-        return super().getRawAxis(self.mapping.kLeftX)
+        return super().getRawAxis(self.getControllerMapping().kLeftX)
     def getLeftY(self):
-        return super().getRawAxis(self.mapping.kLeftY)
+        return super().getRawAxis(self.getControllerMapping().kLeftY)
 
     def getRightX(self):
-        return super().getRawAxis(self.mapping.kRightX)
+        return super().getRawAxis(self.getControllerMapping().kRightX)
     def getRightY(self):
-        return super().getRawAxis(self.mapping.kRightY)
+        return super().getRawAxis(self.getControllerMapping().kRightY)
