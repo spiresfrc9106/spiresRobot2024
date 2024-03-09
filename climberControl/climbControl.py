@@ -16,7 +16,7 @@ ZERO_OUT_REV_PER_S = ZERO_OUT_VEL_INCH_PER_S * CLIMB_REVS_PER_INCH
 ZERO_OUT_RPM = ZERO_OUT_REV_PER_S * 60
 ZERO_OUT_RAD_PER_SEC = RPM2RadPerSec(ZERO_OUT_RPM)
 
-CLIMB_SPEED_FUDGE_FACTOR = 5.0
+CLIMB_SPEED_FUDGE_FACTOR = 5.0 # TODO: this should be between 0 and 1
 MAX_CLIMB_SPEED_RAD_PER_SEC = DCMotor.NEO(1).freeSpeed * CLIMB_SPEED_FUDGE_FACTOR
 
 
@@ -26,7 +26,7 @@ class ClimberMotorControl():
         # For initial tests, it might be easiest to set this to "yes"
         # And use joysticks to ensure other factors are correct
         # Then test out the zeroing
-        self.hasZeroed = "yes"  # "no" or "yes"
+        self.hasZeroed = "yes"
 
         # TODO: this spark max can id should be moved to a constants file
         self.motor = WrapperedSparkMax(canID, f"_climber{name}", brakeMode=True, curLimitA=5)
@@ -80,8 +80,8 @@ class ClimberMotorControl():
 class ClimberControl(metaclass=Singleton):
     def __init__(self):
         # TODO: this spark max can id should be moved to a constants file
-        self.motorLeft = ClimberMotorControl(name='left', inverted=True, canID=16)
-        self.motorRight = ClimberMotorControl(name='right', inverted=True, canID=14)
+        self.motorLeft = ClimberMotorControl(name='left', inverted=False, canID=16)
+        self.motorRight = ClimberMotorControl(name='right', inverted=False, canID=14)
         self.climbCmdPercentage = 0.0
 
     def update(self):
