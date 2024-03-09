@@ -36,6 +36,7 @@ class DrivetrainControl(metaclass=Singleton):
         self.markSendToModulesName         = self.stt.makePaddedMarkName("SendCommandsToModuleAndUpdate")
         self.markPoseEstUpdateName         = self.stt.makePaddedMarkName("poseEst.update")
         self.markGainsHasChangedName       = self.stt.makePaddedMarkName("gains.hasChanged")
+
         self.modules = []
         self.modules.append(SwerveModuleControl("FL", 2, 3, 0,
             FL_ENCODER_MOUNT_OFFSET_RAD, FL_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
@@ -47,6 +48,8 @@ class DrivetrainControl(metaclass=Singleton):
             BR_ENCODER_MOUNT_OFFSET_RAD, BR_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
         self.desChSpd = ChassisSpeeds()
         self.curDesPose = Pose2d()
+
+        self.cmdBrake = False
 
         self.gains = SwerveModuleGainSet()
 
@@ -91,13 +94,19 @@ class DrivetrainControl(metaclass=Singleton):
         self.desChSpd = ChassisSpeeds.discretize(tmp.vx, tmp.vy, tmp.omega, 0.02)
         self.poseEst.telemetry.setDesiredPose(cmd.getPose())
 
+    def setCmdBrake(self, brake):
+        self.cmdBrake = brake
+        # Reset desChSpd to avoid reverting to the previous state when brake is released
+        currentRotation = Rotation2d.fromDegrees(self.getCurEstPose().rotation().degrees())
+        self.desChSpd = ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, 0, currentRotation)
+
     def update(self):
         """
         Main periodic update, should be called every 20ms
         """
 
-        if abs(self.desChSpd.vx) < 0.01 and abs(self.desChSpd.vy) < 0.01 and abs(self.desChSpd.omega) < 0.01:
-            # When we're not moving, "toe in" the wheels to resist getting pushed around
+        if self.cmdBrake:
+            # Brake by "toe in" the wheels to resist getting pushed around or sliding
             flModState = SwerveModuleState(angle=Rotation2d.fromDegrees(45), speed=0)
             frModState = SwerveModuleState(angle=Rotation2d.fromDegrees(-45), speed=0)
             blModState = SwerveModuleState(angle=Rotation2d.fromDegrees(45), speed=0)
