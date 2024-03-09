@@ -1,8 +1,6 @@
 import typing
 from wpilib.interfaces import GenericHID
 
-from debugMaster.debug import Debug
-
 
 class GenericXboxController(GenericHID):
     '''
@@ -10,6 +8,7 @@ class GenericXboxController(GenericHID):
 
     Always default to XBox360 for safety
     '''
+    #pylint: disable=R0904
     class XBox360Mapping:
         # Sticks and Triggers
         kLeftTrigger: typing.ClassVar[int] = 2

@@ -2,14 +2,13 @@ import sys
 import gc
 import wpilib
 from Autonomous.modes.driveOut import DriveOut
-from climberControl.climberControl import ClimberControl
+from climberControl.climbControl import ClimberControl
 from robotConfig import webserverConstructorOrNone
 from robotConfig import dashboardOrNone
 from humanInterface.operatorInterface import OperatorInterface
 from humanInterface.driverInterface import DriverInterface
 from humanInterface.ledControl import LEDControl
 from drivetrain.drivetrainControl import DrivetrainControl
-# from drivetrain.drivetrainTrajectoryControl import DrivetrainTrajectoryControl
 from utils.segmentTimeTracker import SegmentTimeTracker
 from utils.signalLogging import SignalWrangler
 from utils.calibration import CalibrationWrangler
@@ -20,7 +19,6 @@ from utils.rioMonitor import DiskStats, RUN_PERIODIC_LOOP
 from utils.singleton import destroyAllSingletonInstances
 from AutoSequencerV2.autoSequencer import AutoSequencer
 from debugMaster.debug import Debug
-from noteMaster.noteHandler import NoteHandler
 
 class MyRobot(wpilib.TimedRobot):
     #########################################################

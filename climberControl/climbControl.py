@@ -12,8 +12,8 @@ class ClimberControl:
         self.cmdSpd = 0
 
     def setClimberSpeed(self, inputSpeedRPS):
-      """Set climber speed to inputSpeed with a unit of rotations per second"""
-      self.cmdSpd = inputSpeedRPS
+        """Set climber speed to inputSpeed with a unit of rotations per second"""
+        self.cmdSpd = inputSpeedRPS
 
     def update(self):
-      self.motor.setVelRPS(self.cmdSpd)
+        self.motor.setVelRPS(self.cmdSpd)

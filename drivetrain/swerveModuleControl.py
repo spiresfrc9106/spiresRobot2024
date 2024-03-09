@@ -6,11 +6,11 @@ from wpimath.kinematics import SwerveModuleState
 from wpimath.kinematics import SwerveModulePosition
 from wpimath.geometry import Rotation2d
 import wpilib
-from utils.calibration import Calibration
 
 from wrappers.wrapperedSparkMax import WrapperedSparkMax
 from dashboardWidgets.swerveState import getAzmthDesTopicName, getAzmthActTopicName
 from dashboardWidgets.swerveState import getSpeedDesTopicName, getSpeedActTopicName
+from utils.calibration import Calibration
 from utils.signalLogging import log
 from utils.units import rad2Deg
 from utils.faults import Fault
