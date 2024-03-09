@@ -8,7 +8,7 @@ class Debug(metaclass=Singleton):
         """
 
         ### LOG TYPE SETUP ###
-        self.piece = True
+        self.piece = False
         self.robot = False
         self.toPrint = {}
 

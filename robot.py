@@ -88,6 +88,7 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.toPrint.update({'test': False})
         self.dbg.toPrint.update({'note': False})  # True
         self.dbg.toPrint.update({'error': False})  # True
+        self.dbg.toPrint.update({'dInt': True})
 
         # Uncomment this and simulate to update the code
         # dependencies graph
