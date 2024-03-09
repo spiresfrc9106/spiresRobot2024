@@ -24,7 +24,6 @@ class XboxOneXController(GenericHID):
 
     def __init__(self, port: int):
         super().__init__(port)
-        self.dbg = Debug()
 
     def getLeftY(self):
         return super().getRawAxis(self.kLeftY)
