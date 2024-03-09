@@ -56,15 +56,22 @@ class DriverInterface:
             vYJoy = applyDeadband(vYJoyRaw, 0.15)
             vTJoy = applyDeadband(vTJoyRaw, 0.15)
 
-            # Normally robot goes half speed - unlock full speed on
-            # sprint command being active
-            sprintMult = 1.0 if (self.ctrl.getLeftBumper()) else 0.5
+
+            # Robot goes half speed by default
+            # Press and hold Left Bumper to unlock full speed sprint
+            # Press and hold B Button to crawl at quarter speed
+            if self.ctrl.getLeftBumper():
+                speedMult = 1.0
+            elif self.ctrl.getBButton():
+                speedMult = 0.25
+            else:
+                speedMult = 0.5
 
             # Convert joystick fractions into physical units of velocity
             # Nathan requested that sprint mode not apply to rotation
             # He requested that rotation to be faster than half-speed but not quite sprint speeds
-            self.velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * sprintMult
-            self.velYCmdRaw = vYJoy * MAX_STRAFE_SPEED_MPS * sprintMult
+            self.velXCmdRaw = vXJoy * MAX_FWD_REV_SPEED_MPS * speedMult
+            self.velYCmdRaw = vYJoy * MAX_STRAFE_SPEED_MPS * speedMult
             self.velTCmdRaw = vTJoy * MAX_ROTATE_SPEED_RAD_PER_SEC * 0.75
 
             # Slew-rate limit the velocity units to not change faster than
