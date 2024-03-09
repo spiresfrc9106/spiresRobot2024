@@ -2,10 +2,8 @@ import sys
 import gc
 import wpilib
 from Autonomous.modes.driveOut import DriveOut
-from climberControl.climbControl import ClimberControl
 from robotConfig import webserverConstructorOrNone
 from robotConfig import dashboardOrNone
-from humanInterface.operatorInterface import OperatorInterface
 from humanInterface.driverInterface import DriverInterface
 from humanInterface.ledControl import LEDControl
 
@@ -56,10 +54,10 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.toPrint.update({'error': False})
 
         self.driveTrain = DrivetrainControl()
-        self.climberControl = ClimberControl()
+        # self.climberControl = ClimberControl()
 
         self.dInt = DriverInterface()
-        self.opInt = OperatorInterface()
+        # self.opInt = OperatorInterface()
 
         self.ledCtrl = LEDControl()
 
@@ -112,7 +110,7 @@ class MyRobot(wpilib.TimedRobot):
         self.stt.perhapsMark(self.markDriveTrainName)
         self.ledCtrl.update()
 
-        self.climberControl.update()
+        # self.climberControl.update()
 
         # self.noteHandler.update()
 
@@ -169,7 +167,7 @@ class MyRobot(wpilib.TimedRobot):
 
     def teleopPeriodic(self):
         self.dInt.update()
-        self.opInt.update()
+        # self.opInt.update()
 
         self.dbg.print("robot", "running game mode")
         self.dbg.print("hi", f"{self.dInt.getVxCmd()} {self.dInt.getVyCmd()} {self.dInt.getVtCmd()}")
@@ -179,7 +177,7 @@ class MyRobot(wpilib.TimedRobot):
         else:
             self.driveTrain.setCmdRobotRelative(self.dInt.getVxCmd(), self.dInt.getVyCmd(), self.dInt.getVtCmd())
 
-        self.climberControl.setClimbCmdPercentage(self.opInt.getClimberCmdPercentage())
+        # self.climberControl.setClimbCmdPercentage(self.opInt.getClimberCmdPercentage())
 
 
         # self.noteHandler.intakeStartCmd = self.opInt.getStartIntakeCmd()
