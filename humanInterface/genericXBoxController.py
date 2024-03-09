@@ -47,7 +47,6 @@ class GenericXboxController(GenericHID):
 
     def __init__(self, port: int):
         super().__init__(port)
-        self.dbg = Debug()
         self.mapping = None
         self.setControllerMapping()
 
@@ -56,10 +55,7 @@ class GenericXboxController(GenericHID):
             self.setControllerMapping()
 
     def setControllerMapping(self):
-        self.dbg.print('test', f'Connected {super().isConnected()}')
         if super().isConnected():
-            self.dbg.print("test", f'Type {super().getType()}')
-            self.dbg.print("test", f'Name {super().getName()}')
             if (super().getType() == GenericHID.HIDType.kHIDJoystick and
                 super().getName() == "Xbox Wireless Controller"):
                 self.mapping = self.XboxOneXMapping()

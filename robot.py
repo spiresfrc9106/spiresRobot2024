@@ -52,9 +52,9 @@ class MyRobot(wpilib.TimedRobot):
         self.dbg.toPrint.update({'velState': False})
         self.dbg.toPrint.update({'sparkUpdates': False})
         self.dbg.toPrint.update({'hi': False})
-        self.dbg.toPrint.update({'test': True})
-        self.dbg.toPrint.update({'note': False})  # True
-        self.dbg.toPrint.update({'error': False})  # True
+        self.dbg.toPrint.update({'test': False})
+        self.dbg.toPrint.update({'note': False})
+        self.dbg.toPrint.update({'error': False})
 
         self.driveTrain = DrivetrainControl()
         self.climberControl = ClimberControl()
