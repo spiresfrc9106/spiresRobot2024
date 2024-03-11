@@ -1,5 +1,9 @@
+import math
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState
 from wpimath.geometry import Pose2d, Rotation2d
+from wpimath.controller import PIDController
+from utils.mathUtils import limit
+from utils.units import deg2Rad
 
 from utils.singleton import Singleton
 from utils.allianceTransformUtils import onRed
@@ -9,7 +13,7 @@ from drivetrain.poseEstimation.drivetrainPoseEstimator import DrivetrainPoseEsti
 from drivetrain.swerveModuleControl import SwerveModuleControl
 from drivetrain.swerveModuleGainSet import SwerveModuleGainSet
 from drivetrain.drivetrainTrajectoryControl import DrivetrainTrajectoryControl
-from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS
+from drivetrain.drivetrainPhysical import MAX_FWD_REV_SPEED_MPS, MAX_ROTATE_SPEED_RAD_PER_SEC
 from drivetrain.drivetrainPhysical import FL_ENCODER_MOUNT_OFFSET_RAD
 from drivetrain.drivetrainPhysical import FR_ENCODER_MOUNT_OFFSET_RAD
 from drivetrain.drivetrainPhysical import BL_ENCODER_MOUNT_OFFSET_RAD
@@ -36,6 +40,7 @@ class DrivetrainControl(metaclass=Singleton):
         self.markSendToModulesName         = self.stt.makePaddedMarkName("SendCommandsToModuleAndUpdate")
         self.markPoseEstUpdateName         = self.stt.makePaddedMarkName("poseEst.update")
         self.markGainsHasChangedName       = self.stt.makePaddedMarkName("gains.hasChanged")
+
         self.modules = []
         self.modules.append(SwerveModuleControl("FL", 2, 3, 0,
             FL_ENCODER_MOUNT_OFFSET_RAD, FL_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
@@ -45,6 +50,9 @@ class DrivetrainControl(metaclass=Singleton):
             BL_ENCODER_MOUNT_OFFSET_RAD, BL_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
         self.modules.append(SwerveModuleControl("BR", 8, 9, 3,
             BR_ENCODER_MOUNT_OFFSET_RAD, BR_INVERT_WHEEL_MOTOR, INVERT_AZMTH_MOTOR, INVERT_AZMTH_ENCODER))
+
+        self.coastCmd = False
+
         self.desChSpd = ChassisSpeeds()
         self.curDesPose = Pose2d()
 
@@ -54,18 +62,34 @@ class DrivetrainControl(metaclass=Singleton):
 
         self.trajCtrl = DrivetrainTrajectoryControl()
 
+        # Closed-loop control for heading commands
+        self.rotationCtrl = PIDController(
+            self.trajCtrl.rotP.get(),
+            self.trajCtrl.rotI.get(),
+            self.trajCtrl.rotD.get()
+        )
+        self.rotationCtrl.enableContinuousInput(-math.pi, math.pi)
+
         self._updateAllCals()
 
-    def setCmdFieldRelative(self, velX, velY, velT):
+    def setCmdFieldRelative(self, velX, velY, velT, headingDeg=None):
         """Send commands to the robot for motion relative to the field
 
         Args:
             velX (float): Desired speed in the field's X direction, in meters per second
             velY (float): Desired speed in the field's Y axis, in th meters per second
             velT (float): Desired rotational speed in the field's reference frame, in radians per second
+            headingDeg (int | None): Desired field relative heading in degrees
         """
+        if headingDeg is not None:
+            rotFF = 0 # TODO: is there a better feed-forward value here?
+            rotFB = self.rotationCtrl.calculate(self.poseEst.getCurEstPose().rotation().radians(), deg2Rad(headingDeg))
+            rotVel = limit(rotFF + rotFB, MAX_ROTATE_SPEED_RAD_PER_SEC)
+        else:
+            rotVel = velT
+
         tmp = ChassisSpeeds.fromFieldRelativeSpeeds(
-            velX, velY, velT, self.poseEst.getCurEstPose().rotation()
+            velX, velY, rotVel, self.poseEst.getCurEstPose().rotation()
         )
         self.desChSpd = ChassisSpeeds.discretize(tmp.vx, tmp.vy, tmp.omega, 0.02)
         self.poseEst.telemetry.setDesiredPose(self.poseEst.getCurEstPose())
@@ -91,12 +115,18 @@ class DrivetrainControl(metaclass=Singleton):
         self.desChSpd = ChassisSpeeds.discretize(tmp.vx, tmp.vy, tmp.omega, 0.02)
         self.poseEst.telemetry.setDesiredPose(cmd.getPose())
 
+    def setCoastCmd(self, coast):
+        self.coastCmd = coast
+
     def update(self):
         """
         Main periodic update, should be called every 20ms
         """
 
-        if abs(self.desChSpd.vx) < 0.01 and abs(self.desChSpd.vy) < 0.01 and abs(self.desChSpd.omega) < 0.01:
+        if (abs(self.desChSpd.vx) < 0.01 and
+            abs(self.desChSpd.vy) < 0.01 and
+            abs(self.desChSpd.omega) < 0.01 and
+            not self.coastCmd):
             # When we're not moving, "toe in" the wheels to resist getting pushed around
             flModState = SwerveModuleState(angle=Rotation2d.fromDegrees(45), speed=0)
             frModState = SwerveModuleState(angle=Rotation2d.fromDegrees(-45), speed=0)
@@ -126,6 +156,12 @@ class DrivetrainControl(metaclass=Singleton):
         # Update calibration values if they've changed
         if self.gains.hasChanged():
             self._updateAllCals()
+        if self.trajCtrl.rotP.isChanged() or self.trajCtrl.rotI.isChanged() or self.trajCtrl.rotD.isChanged():
+            self.rotationCtrl.setPID(
+                self.trajCtrl.rotP.get(),
+                self.trajCtrl.rotI.get(),
+                self.trajCtrl.rotD.get()
+            )
         self.stt.perhapsMark(self.markGainsHasChangedName)
 
     def _updateAllCals(self):

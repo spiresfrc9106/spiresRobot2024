@@ -27,7 +27,7 @@ class DrivetrainTrajectoryControl:
         self.transP = Calibration("Drivetrain HDC Translation kP", 6.0)
         self.transI = Calibration("Drivetrain HDC Translation kI", 0.0)
         self.transD = Calibration("Drivetrain HDC Translation kD", 0.0)
-        self.rotP = Calibration("Drivetrain HDC Rotation kP", 8.0)
+        self.rotP = Calibration("Drivetrain HDC Rotation kP", 4.0)
         self.rotI = Calibration("Drivetrain HDC Rotation kI", 0.0)
         self.rotD = Calibration("Drivetrain HDC Rotation kD", 0.0)
 
