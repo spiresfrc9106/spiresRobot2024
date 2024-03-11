@@ -3,6 +3,7 @@ from wpimath.kinematics import ChassisSpeeds, SwerveModuleState
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.controller import PIDController
 from utils.mathUtils import limit
+from utils.units import deg2Rad
 
 from utils.singleton import Singleton
 from utils.allianceTransformUtils import onRed
@@ -24,7 +25,6 @@ from drivetrain.drivetrainPhysical import BR_INVERT_WHEEL_MOTOR
 from drivetrain.drivetrainPhysical import INVERT_AZMTH_MOTOR
 from drivetrain.drivetrainPhysical import INVERT_AZMTH_ENCODER
 from drivetrain.drivetrainPhysical import kinematics
-from utils.units import deg2Rad
 
 
 class DrivetrainControl(metaclass=Singleton):
