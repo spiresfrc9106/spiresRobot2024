@@ -6,7 +6,7 @@ def getRIOStreamURL(port):
     if wpilib.RobotBase.isSimulation():
         return f"http://localhost:{port}"
     else:
-        return f"http://roborio-1736-frc.local:{port}"
+        return f"http://roborio-9106-frc.local:{port}"
 
 
 class Camera(WidgetConfig):

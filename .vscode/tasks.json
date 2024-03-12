@@ -148,10 +148,10 @@
             "label": "PyFRC: View Netconsole",
             "type": "shell",
             "windows": {
-                "command": "py -3 -m netconsole roboRIO-1736-frc.local"
+                "command": "py -3 -m netconsole roboRIO-9106-frc.local"
             },
             "linux": {
-                "command": "netconsole roboRIO-1736-frc.local"
+                "command": "netconsole roboRIO-9106-frc.local"
             },
             "group": {
                 "kind": "build"

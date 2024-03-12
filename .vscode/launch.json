@@ -10,7 +10,7 @@
             "type": "python",
             "request": "attach",
             "connect": {
-                "host": "roboRIO-1736-frc.local",
+                "host": "roboRIO-9106-frc.local",
                 "port": 5678
             },
             "pathMappings": [

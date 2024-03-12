@@ -137,7 +137,7 @@ Unlike other widgets, it does not require a NT topic. It instead requires the we
 
 ```py
 webserver.addDashboardWidget(
-    Camera(75, 60, "http://roborio-1736-frc.local:1181"))
+    Camera(75, 60, "http://roborio-9106-frc.local:1181"))
 ```
 
 ### Auto Chooser

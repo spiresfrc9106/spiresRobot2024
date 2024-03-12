@@ -6,9 +6,9 @@ Casserole's robots have traditionally hosted a small website with debug, diagnos
 
 The webserver on the robot is accessed at:
 
-[http://10.17.36.2:5805](http://10.17.36.2:5805)
+[http://10.91.6.2:5805](http://10.91.6.2:5805)
 
-This is because the roboRIO is at the IP address `10.17.36.2`, and the website is served on port `5805`
+This is because the roboRIO is at the IP address `10.9.6.2`, and the website is served on port `5805`
 
 If running in simulation, that same website is hosted on your PC (`localhost`). It can be accessed at:
 
