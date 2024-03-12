@@ -23,7 +23,11 @@ Before developing code on a new computer, perform the following:
 
 ## Docs
 
-[Click here to see documentation for common libraries](.docs/UserAPI).
+- [High level code design patterns](.docs/designPatterns)
+- [Commonly used modules in this repository](.docs/commonModules)
+- [Most recent relationship diagram between classes](.docs/graph.md)
+    - Keep this file up to date by periodically running `codeStructureReportGen/reportGen.py`
+
 
 ## The robot website
 

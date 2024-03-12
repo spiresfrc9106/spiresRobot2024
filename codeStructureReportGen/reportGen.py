@@ -86,7 +86,7 @@ def generate(topLevelObject):
     # build up edges
     edgeSet = set(classStructureRoot.getEdgeList())
 
-    with open("docs/graph.md", "w", encoding="utf-8") as outf:
+    with open(".docs/graph.md", "w", encoding="utf-8") as outf:
         outf.write("# Class Relationships\n\n")
         outf.write("```mermaid\n")
         outf.write("flowchart TD\n")
