@@ -17,6 +17,7 @@ class CollectedTimeRec():
         self.durationS = durationS
         self.cpuS = cpuS
 
+# pylint: disable=invalid-name
 class WindowedStats():
 
     def __init__(self, pointsToKeep=100):

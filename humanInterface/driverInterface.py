@@ -36,8 +36,7 @@ class DriverInterface:
             rateLimit=MAX_ROTATE_ACCEL_RAD_PER_SEC_2
         )
 
-
-
+    # pylint: disable=too-many-statements
     def update(self):
         """Main update - call this once every 20ms"""
         self.ctrl.update()

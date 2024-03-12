@@ -41,6 +41,7 @@ class ClimberMotorControl():
             print(f"newStateClimberState={self.name}:{newState}")
             self.hasZeroed = newState
 
+    #pylint: disable=too-many-branches
     def update(self):
         if self.hasZeroed == "no":
             self.changeHasZeroed("enteringZeroing")
