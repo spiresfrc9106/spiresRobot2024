@@ -2,13 +2,13 @@ import typing
 from wpilib.interfaces import GenericHID
 
 
+# pylint: disable=R0904
 class GenericXboxController(GenericHID):
     '''
     This class allows us to swap between XBox 360 and XBox One X Controls easily
 
     Always default to XBox360 for safety
     '''
-    #pylint: disable=R0904
     class XBox360Mapping:
         # Sticks and Triggers
         kLeftTrigger: typing.ClassVar[int] = 2
