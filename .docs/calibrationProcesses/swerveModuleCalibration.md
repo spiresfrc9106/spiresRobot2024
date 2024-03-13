@@ -5,7 +5,7 @@
 
 1. Turn on the robot and connect to its network.
 2. Determine the currently deployed git branch with `robotpy deploy-info`. Checkout this branch `git checkout <BRANCH>`.
-3. Open `robotDependentConstants.py`. Find the configuration for the relevant robot. Set the configuration for FLOffset, FROffset, BLOffset, and BROffset to 0. Save these changes.
+3. Open `drivetrain/robotDependentConstants.py`. Find the configuration for the relevant robot. Set the configuration for FLOffset, FROffset, BLOffset, and BROffset to 0. Save these changes.
 4. Deploy the code with `robotpy deploy --skip-tests`
 5. Open AdvantageScope and connect to the robot (File > Connect to Robot). Clear out any values currently on an axis or discrete fields section.
 6. On the left side of AdvantageScope find SmartDashboard/FL_wheel_motorActPos and drag it to the "Left Axis" area. Do the same for FR_wheel_motorActPos, BL_wheel_motorActPos, and BR_wheel_motorActPos.
