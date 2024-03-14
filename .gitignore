@@ -7,5 +7,6 @@ networktables.json
 
 # 9106 specific ignores
 /venv*
+/.venv
 /.idea
 simgui.json
