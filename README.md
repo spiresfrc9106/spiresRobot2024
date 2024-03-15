@@ -1,10 +1,14 @@
-# Spires 2024 - Team #9106
+![Spires Logo Banner](./.assets/images/github-banner.png)
 
-![Dev CI Status](https://github.com/spiresfrc9106/spiresRobot2024/actions/workflows/ci.yml/badge.svg?branch=dev)
+Source code for the Spires 2024 FIRST Robotics Competition robot.
 
-Source code for the Spires 2024 robot.
+---
+
+Thank you to our sponsors!
 
 This repository started as a fork of [RobotCasserole2024](https://github.com/RobotCasserole1736/RobotCasserole2024). We are grateful to Team #1736 for the inspiration.
+
+![Dev CI Status](https://github.com/spiresfrc9106/spiresRobot2024/actions/workflows/ci.yml/badge.svg?branch=dev)
 
 ## Installation
 
