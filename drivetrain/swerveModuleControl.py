@@ -48,7 +48,7 @@ class SwerveModuleControl:
             invertWheel (bool): Inverts the drive direction of the wheel - needed since left/right sides are mirrored
             invertWheel (bool): Inverts the steering direction of the wheel - needed if motor is mounted upside
         """
-        self.wheelCurLimitACal = Calibration(f'SwerveModule {moduleName} Current Limit', 25, "Amps", 0)
+        self.wheelCurLimitACal = Calibration(f'SwerveModule {moduleName} Current Limit', 40, "Amps", 0)
         self.wheelMotor = WrapperedSparkMax(
             wheelMotorCanID, moduleName + "_wheel", brakeMode=False, curLimitA=int(self.wheelCurLimitACal.get()))
         self.azmthMotor = WrapperedSparkMax(
