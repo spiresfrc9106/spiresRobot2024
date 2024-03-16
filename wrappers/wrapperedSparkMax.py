@@ -127,8 +127,7 @@ class WrapperedSparkMax:
             vel = self.encoder.getVelocity()
         else:
             vel = 0
-        vel = vel/60
-        log(self.name + "_motorActVel", vel, "RPS")
+        log(self.name + "_motorActVel", vel, "RPM")
         return RPM2RadPerSec(vel)
 
     def getAppliedOutput(self):
