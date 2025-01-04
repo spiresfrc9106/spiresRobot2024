@@ -58,6 +58,7 @@ class SwerveModuleControl:
         self.azmthEnc = wrapperedSwerveDriveAzmthEncoder(
             azmthEncoderPortIdx, moduleName + "_azmthEnc", azmthOffset, invertAzmthEncoder
         )
+        self.azmthOffset = azmthOffset
 
         self.wheelMotor.setInverted(invertWheel)
         self.azmthMotor.setInverted(invertAzmthMotor)
@@ -103,6 +104,12 @@ class SwerveModuleControl:
             self.actualState.angle.degrees(),
             "deg",
         )
+        log(
+            getAzmthActTopicName(self.moduleName)+"offset",
+            self.azmthOffset,
+            "deg",
+        )
+
         log(
             getSpeedDesTopicName(self.moduleName),
             self.optimizedDesiredState.speed / MAX_FWD_REV_SPEED_MPS,
